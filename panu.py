@@ -1,14 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""
-    Slixmpp: The Slick XMPP Library
-    Copyright (C) 2010  Nathanael C. Fritz
-    This file is part of Slixmpp.
-
-    See the file LICENSE for copying permission.
-"""
-
 import logging
 from getpass import getpass
 from argparse import ArgumentParser
@@ -113,7 +105,6 @@ class MUCBot(slixmpp.ClientXMPP):
     def muc_message(self, msg):
         if msg['mucnick'] == self.nick:
             return
-        #self.send_message(mto=msg['from'].bare, mbody="I heard that, %s." % msg['mucnick'], mtype='groupchat')
         print(msg['mucnick'] + ": " + msg['body'])
         if msg['body'] == self.prev_msg and msg['mucnick'] != self.prev_author:
             self.msg(msg['body'])
