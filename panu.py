@@ -8,6 +8,7 @@ import configparser
 import slixmpp
 import sys
 import re
+import random
 
 CONFIG_FILE = 'panu.conf'
 
@@ -73,6 +74,9 @@ class MUCBot(slixmpp.ClientXMPP):
         self.re_cmd = re.compile('^!(\w+)( +(.*))?')
         #self.re_cmd_args = re.compile('^!\w+ +(.*)')
 
+        self.add_command('battle',
+                         '!battle : sélectionne un choix au hasard',
+                         self.cmd_battle)
         self.add_command('quote',
                          '!quote [add] [<nick>] [recherche] : Citation aléatoire.',
                          self.cmd_quote)
@@ -120,7 +124,7 @@ class MUCBot(slixmpp.ClientXMPP):
             cmd_name = s.group(1)
             args = s.group(3)
             if cmd_name in self.cmds:
-                self.cmds[cmd_name].handler(args)
+                self.cmds[cmd_name].handler(args, msg)
             else:
                 self.msg("Commande inconnue.")
         self.prev_msg = msg['body']
@@ -144,21 +148,33 @@ class MUCBot(slixmpp.ClientXMPP):
         cmd = Command(description, handler)
         self.cmds[name] = cmd
 
-    def cmd_quote(self, args):
+    def cmd_quote(self, args, msg):
         self.msg("coucou ! " + str(args))
 
-    def cmd_quiet(self, args):
+    def cmd_quiet(self, args, msg):
         if not self.quiet:
             self.msg("Becoming quiet.")
         self.quiet = not self.quiet
         if not self.quiet:
             self.msg("Stop being quiet.")
 
-    def cmd_help(self, args):
+    def cmd_help(self, args, msg):
         help_message = ""
         for cmd in self.cmds:
             help_message += self.cmds[cmd].description + "\n"
         self.msg(help_message.rstrip())
+
+    def cmd_battle(self, args, msg):
+        choices = args.split()
+        choice = random.choice(choices)
+        r = random.randint(1, 20)
+        # sometimes change answer
+        if (r == 1):
+            self.msg(msg['mucnick'] + ': ' + "demain.")
+        elif (r == 2 and len(choices) == 2):
+            self.msg(msg['mucnick'] + ': ' + "les deux")
+        else:
+            self.msg(msg['mucnick'] + ': ' + choice)
 
 if __name__ == '__main__':
     parser = ArgumentParser()
