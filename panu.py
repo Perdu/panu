@@ -63,6 +63,7 @@ class MUCBot(slixmpp.ClientXMPP):
         self.prev_msg = ""
         self.prev_author = ""
         self.cmds = {}
+        self.quiet = False
         # Probability of talking.
         # Defaults to 0, gains 0.1 every message. Can be decreased when the bot is told
         # to shut up.
@@ -74,7 +75,10 @@ class MUCBot(slixmpp.ClientXMPP):
 
         self.add_command('quote',
                          '!quote [add] [<nick>] [recherche]: Citation aléatoire.',
-                         self.quote)
+                         self.cmd_quote)
+        self.add_command('quiet',
+                         '!quiet',
+                         self.cmd_quiet)
         self.add_event_handler("session_start", self.start)
         self.add_event_handler("groupchat_message", self.muc_message)
         self.add_event_handler("message", self.direct_message)   
@@ -105,7 +109,7 @@ class MUCBot(slixmpp.ClientXMPP):
     def muc_message(self, msg):
         if msg['mucnick'] == self.nick:
             return
-        print(msg['mucnick'] + ": " + msg['body'])
+        print('<' + msg['mucnick'] + "> | " + msg['body'])
         if msg['body'] == self.prev_msg and msg['mucnick'] != self.prev_author:
             self.msg(msg['body'])
         s = self.re_cmd.search(msg['body'])
@@ -129,15 +133,23 @@ class MUCBot(slixmpp.ClientXMPP):
             self.plugin['xep_0045'].join_muc(self.room, self.nick, wait=True)
 
     def msg(self, text):
-        self.send_message(mto=config.room_jid, mbody=text, mtype='groupchat')
-        print(self.nick + ': ' + text)
+        if not self.quiet:
+            self.send_message(mto=config.room_jid, mbody=text, mtype='groupchat')
+            print(self.nick + ': ' + text)
 
     def add_command(self, name, description, handler):
         cmd = Command(description, handler)
         self.cmds[name] = cmd
 
-    def quote(self, args):
+    def cmd_quote(self, args):
         self.msg("coucou ! " + str(args))
+
+    def cmd_quiet(self, args):
+        if not self.quiet:
+            self.msg("Becoming quiet.")
+        self.quiet = not self.quiet
+        if not self.quiet:
+            self.msg("Stop being quiet.")
 
 if __name__ == '__main__':
     parser = ArgumentParser()
