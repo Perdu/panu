@@ -77,7 +77,7 @@ class MUCBot(slixmpp.ClientXMPP):
                          '!quote [add] [<nick>] [recherche]: Citation aléatoire.',
                          self.cmd_quote)
         self.add_command('quiet',
-                         '!quiet',
+                         '!quiet: Rendre le bot silencieux.',
                          self.cmd_quiet)
         self.add_event_handler("session_start", self.start)
         self.add_event_handler("groupchat_message", self.muc_message)
