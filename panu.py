@@ -74,11 +74,14 @@ class MUCBot(slixmpp.ClientXMPP):
         #self.re_cmd_args = re.compile('^!\w+ +(.*)')
 
         self.add_command('quote',
-                         '!quote [add] [<nick>] [recherche]: Citation aléatoire.',
+                         '!quote [add] [<nick>] [recherche] : Citation aléatoire.',
                          self.cmd_quote)
         self.add_command('quiet',
-                         '!quiet: Rendre le bot silencieux.',
+                         '!quiet : Rendre le bot silencieux.',
                          self.cmd_quiet)
+        self.add_command('help',
+                         '!help : affiche les commandes disponibles',
+                         self.cmd_help)
         self.add_event_handler("session_start", self.start)
         self.add_event_handler("groupchat_message", self.muc_message)
         self.add_event_handler("message", self.direct_message)   
@@ -150,6 +153,12 @@ class MUCBot(slixmpp.ClientXMPP):
         self.quiet = not self.quiet
         if not self.quiet:
             self.msg("Stop being quiet.")
+
+    def cmd_help(self, args):
+        help_message = ""
+        for cmd in self.cmds:
+            help_message += self.cmds[cmd].description + "\n"
+        self.msg(help_message.rstrip())
 
 if __name__ == '__main__':
     parser = ArgumentParser()
