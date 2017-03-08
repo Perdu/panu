@@ -175,10 +175,13 @@ class MUCBot(slixmpp.ClientXMPP):
         if args is not None and len(args) > 0:
             a = args.split()
             if a[0] == 'list':
-                rs = db.query(Quote).all()
+                rs = db.query(Quote.author, func.count(Quote.author)).group_by(Quote.author)
                 m = ""
-                for quote in rs:
-                    m += quote.quote + "\n"
+                rs = sorted(rs, key=lambda r: r[1])
+                for r in rs:
+                    m += r[0] + ' (' + str(r[1]) + ') '
+                m.rstrip(' ')
+                self.msg(m)
             else:
                 random_quote = db.query(Quote).filter_by(author=a[0]).order_by(func.rand()).limit(1)
                 if random_quote.count() > 0:
