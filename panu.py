@@ -82,6 +82,7 @@ class MUCBot(slixmpp.ClientXMPP):
         self.nick = nick
         self.prev_msg = ""
         self.prev_author = ""
+        self.prev_quote_author = ""
         self.cmds = {}
         self.quiet = False
         # Probability of talking.
@@ -105,6 +106,9 @@ class MUCBot(slixmpp.ClientXMPP):
         self.add_command('help',
                          '!help : affiche les commandes disponibles',
                          self.cmd_help)
+        self.add_command('who',
+                         '!who : Indique de qui est la citation précédente.',
+                         self.cmd_who)
         self.add_event_handler("session_start", self.start)
         self.add_event_handler("groupchat_message", self.muc_message)
         self.add_event_handler("message", self.direct_message)   
@@ -179,6 +183,7 @@ class MUCBot(slixmpp.ClientXMPP):
                 random_quote = db.query(Quote).filter_by(author=a[0]).order_by(func.rand()).limit(1)
                 if random_quote.count() > 0:
                     self.msg(random_quote[0].quote)
+                    self.prev_quote_author = random_quote[0].author
                 else:
                     self.msg('Aucune citation trouvée pour %s.' % a[0])
         else:
@@ -208,6 +213,9 @@ class MUCBot(slixmpp.ClientXMPP):
             self.msg(msg['mucnick'] + ': ' + "les deux")
         else:
             self.msg(msg['mucnick'] + ': ' + choice)
+
+    def cmd_who(self, args, msg):
+        self.msg(self.prev_quote_author)
 
 if __name__ == '__main__':
     parser = ArgumentParser()
