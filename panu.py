@@ -10,7 +10,19 @@ import sys
 import re
 import random
 
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Column, Integer, String
+from sqlalchemy.orm import sessionmaker
+from  sqlalchemy.sql.expression import func
+
+# Dependencies:
+# python3-sqlalchemy
+# python3-mysqldb
+
 CONFIG_FILE = 'panu.conf'
+Base = declarative_base()
+db = None
 
 class Config():
     def __init__(self, c):
@@ -53,6 +65,13 @@ class Command():
     def __init__(self, description, handler):
         self.description = description
         self.handler = handler
+
+class Quote(Base):
+    __tablename__ = "quotes"
+    quote_id = Column(Integer, primary_key=True)
+    author = Column(String)
+    details = Column(String)
+    quote = Column(String)
 
 class MUCBot(slixmpp.ClientXMPP):
     
@@ -149,7 +168,21 @@ class MUCBot(slixmpp.ClientXMPP):
         self.cmds[name] = cmd
 
     def cmd_quote(self, args, msg):
-        self.msg("coucou ! " + str(args))
+        if args is not None and len(args) > 0:
+            a = args.split()
+            if a[0] == 'list':
+                rs = db.query(Quote).all()
+                m = ""
+                for quote in rs:
+                    m += quote.quote + "\n"
+            else:
+                random_quote = db.query(Quote).filter_by(author=a[0]).order_by(func.rand()).limit(1)
+                if random_quote.count() > 0:
+                    self.msg(random_quote[0].quote)
+                else:
+                    self.msg('Aucune citation trouvée pour %s.' % a[0])
+        else:
+            self.msg("coucou ! " + str(args))
 
     def cmd_quiet(self, args, msg):
         if not self.quiet:
@@ -196,7 +229,15 @@ if __name__ == '__main__':
         print('Please copy it from %s.example and fill it appropiately.' % CONFIG_FILE)
         sys.exit(1)
     config = Config(c)
-        
+
+    eng = create_engine('mysql+mysqldb://' + config.db_user + ':' +
+                        config.db_pass + '@' + config.db_server +
+                        '/' + config.db_name, pool_recycle=3600)
+    Base.metadata.bind = eng
+    #Base.metadata.create_all()
+    Session = sessionmaker(bind=eng)
+    db = Session()
+
     # Setup logging.
     logging.basicConfig(level=args.loglevel,
                         format='%(levelname)-8s %(message)s')
