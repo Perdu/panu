@@ -109,6 +109,9 @@ class MUCBot(slixmpp.ClientXMPP):
         self.add_command('help',
                          '!help : affiche les commandes disponibles',
                          self.cmd_help)
+        self.add_command('isit',
+                         '!isit <nick> : Deviner de qui est la citation précédente.',
+                         self.cmd_isit)
         self.add_command('who',
                          '!who : Indique de qui est la citation précédente.',
                          self.cmd_who)
@@ -254,6 +257,15 @@ class MUCBot(slixmpp.ClientXMPP):
         if self.prev_quote_details is not None:
             ans += ' (' + self.prev_quote_details + ')'
         self.msg(ans)
+
+    def cmd_isit(self, args, msg):
+        if self.prev_quote_author in ["answer", "random"]:
+            self.msg("Ne cherche pas, je n'en sais rien !")
+        else:
+            if args == self.prev_quote_author:
+                self.msg("Oui !")
+            else:
+                self.msg("Non !")
 
 if __name__ == '__main__':
     parser = ArgumentParser()
