@@ -78,6 +78,7 @@ class MUCBot(slixmpp.ClientXMPP):
     def __init__(self, jid, password, room, nick):
         slixmpp.ClientXMPP.__init__(self, jid, password)
 
+        self.userlist = set()
         self.room = room
         self.nick = nick
         self.prev_msg = ""
@@ -156,11 +157,14 @@ class MUCBot(slixmpp.ClientXMPP):
     def muc_online(self, presence):
         if presence['muc']['nick'] != self.nick:
             print("Presence:", presence['muc']['nick'], '(' + presence['muc']['role'] + ')')
+            self.userlist.add(presence['muc']['nick'])
 
     def muc_offline(self, presence):
         if presence['muc']['nick'] == self.nick:
             print('Got kicked, reconnecting...')
             self.plugin['xep_0045'].join_muc(self.room, self.nick, wait=True)
+        else:
+            self.userlist.remove(presence['muc']['nick'])
 
     def msg(self, text):
         if not self.quiet:
