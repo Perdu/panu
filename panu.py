@@ -204,10 +204,13 @@ class MUCBot(slixmpp.ClientXMPP):
                     author = re.group(1)
                     quote = re.group(2)
                     details = re.group(4)
-                    q = Quote(author=author, quote=quote, details=details)
-                    db.add(q)
-                    db.commit()
-                    self.msg("Citation ajoutée pour %s : %s" % (author, quote))
+                    if db.query(db.query(Quote).filter(Quote.author==author, Quote.quote==quote).exists()).scalar():
+                        self.msg("Citation déjà connue.")
+                    else:
+                        q = Quote(author=author, quote=quote, details=details)
+                        db.add(q)
+                        db.commit()
+                        self.msg("Citation ajoutée pour %s : %s" % (author, quote))
                 else:
                     self.msg("Commande incorrecte.")
             else:
