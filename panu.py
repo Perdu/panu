@@ -198,7 +198,12 @@ class MUCBot(slixmpp.ClientXMPP):
                 else:
                     self.msg('Aucune citation trouvée pour %s.' % a[0])
         else:
-            self.msg("coucou ! " + str(args))
+            random_quote = db.query(Quote).order_by(func.rand()).limit(1)
+            if random_quote.count() > 0:
+                self.msg(random_quote[0].quote)
+                self.prev_quote_author = random_quote[0].author
+            else:
+                self.msg('Aucune citation connue. Ajoutez-en avec !quote add')
 
     def cmd_quiet(self, args, msg):
         if not self.quiet:
