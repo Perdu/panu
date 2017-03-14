@@ -84,6 +84,7 @@ class MUCBot(slixmpp.ClientXMPP):
         self.prev_msg = ""
         self.prev_author = ""
         self.prev_quote_author = ""
+        self.prev_quote_details = ""
         self.cmds = {}
         self.quiet = False
         # Probability of talking.
@@ -204,17 +205,20 @@ class MUCBot(slixmpp.ClientXMPP):
                 else:
                     self.msg("Commande incorrecte.")
             else:
-                random_quote = db.query(Quote).filter_by(author=a[0]).order_by(func.rand()).limit(1)
-                if random_quote.count() > 0:
+                random_quote = db.query(Quote).filter_by(author=a[0]).order_by(func.rand()).limit(1).all()
+                if len(random_quote) > 0:
                     self.msg(random_quote[0].quote)
                     self.prev_quote_author = random_quote[0].author
+                    self.prev_quote_details = random_quote[0].details
                 else:
                     self.msg('Aucune citation trouvée pour %s.' % a[0])
         else:
-            random_quote = db.query(Quote).order_by(func.rand()).limit(1)
-            if random_quote.count() > 0:
+            random_quote = db.query(Quote).order_by(func.rand()).limit(1).all()
+            if len(random_quote) > 0:
                 self.msg(random_quote[0].quote)
                 self.prev_quote_author = random_quote[0].author
+                self.prev_quote_details = random_quote[0].details
+                print(random_quote[0].author, random_quote[0].details)
             else:
                 self.msg('Aucune citation connue. Ajoutez-en avec !quote add')
 
@@ -244,7 +248,10 @@ class MUCBot(slixmpp.ClientXMPP):
             self.msg(msg['mucnick'] + ': ' + choice)
 
     def cmd_who(self, args, msg):
-        self.msg(self.prev_quote_author)
+        ans = self.prev_quote_author
+        if self.prev_quote_details is not None:
+            ans += ' (' + self.prev_quote_details + ')'
+        self.msg(ans)
 
 if __name__ == '__main__':
     parser = ArgumentParser()
