@@ -183,7 +183,11 @@ class MUCBot(slixmpp.ClientXMPP):
                 m = ""
                 rs = sorted(rs, key=lambda r: r[1])
                 for r in rs:
-                    m += r[0] + ' (' + str(r[1]) + ') '
+                    nick = r[0]
+                    # add '_' in the nick to prevent HL
+                    if nick in self.userlist and len(nick) > 1:
+                        nick = nick[0] + '_' + nick[1:]
+                    m += nick + ' (' + str(r[1]) + ') '
                 m.rstrip(' ')
                 self.msg(m)
             else:
