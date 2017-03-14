@@ -205,9 +205,11 @@ class MUCBot(slixmpp.ClientXMPP):
                 else:
                     self.msg("Commande incorrecte.")
             else:
+                # quote <author>
                 random_quote = db.query(Quote).filter_by(author=a[0]).order_by(func.rand()).limit(1).all()
+                nb_quotes_by_author = db.query(Quote).filter_by(author=a[0]).count()
                 if len(random_quote) > 0:
-                    self.msg(random_quote[0].quote)
+                    self.msg(random_quote[0].quote + ' (?/' + str(nb_quotes_by_author) + ')')
                     self.prev_quote_author = random_quote[0].author
                     self.prev_quote_details = random_quote[0].details
                 else:
