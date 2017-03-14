@@ -180,6 +180,9 @@ class MUCBot(slixmpp.ClientXMPP):
         cmd = Command(description, handler)
         self.cmds[name] = cmd
 
+    def convert_quote(self, quote, nick):
+        return quote.replace("%%", nick)
+
     def cmd_quote(self, args, msg):
         if args is not None and len(args) > 0:
             a = args.split()
@@ -212,7 +215,8 @@ class MUCBot(slixmpp.ClientXMPP):
                 random_quote = db.query(Quote).filter_by(author=a[0]).order_by(func.rand()).limit(1).all()
                 nb_quotes_by_author = db.query(Quote).filter_by(author=a[0]).count()
                 if len(random_quote) > 0:
-                    self.msg(random_quote[0].quote + ' (?/' + str(nb_quotes_by_author) + ')')
+                    quote = self.convert_quote(random_quote[0].quote, msg['mucnick'])
+                    self.msg(quote + ' (?/' + str(nb_quotes_by_author) + ')')
                     self.prev_quote_author = random_quote[0].author
                     self.prev_quote_details = random_quote[0].details
                 else:
@@ -220,7 +224,8 @@ class MUCBot(slixmpp.ClientXMPP):
         else:
             random_quote = db.query(Quote).order_by(func.rand()).limit(1).all()
             if len(random_quote) > 0:
-                self.msg(random_quote[0].quote)
+                quote = self.convert_quote(random_quote[0].quote, msg['mucnick'])
+                self.msg(quote)
                 self.prev_quote_author = random_quote[0].author
                 self.prev_quote_details = random_quote[0].details
                 print(random_quote[0].author, random_quote[0].details)
