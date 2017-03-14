@@ -93,6 +93,7 @@ class MUCBot(slixmpp.ClientXMPP):
 
 
         self.re_cmd = re.compile('^!(\w+)( +(.*))?')
+        self.re_quote_add = re.compile('add\s+([^\s]+)\s+([^|]+)(\s*\|\s*(.*))?$')
         #self.re_cmd_args = re.compile('^!\w+ +(.*)')
 
         self.add_command('battle',
@@ -190,6 +191,18 @@ class MUCBot(slixmpp.ClientXMPP):
                     m += nick + ' (' + str(r[1]) + ') '
                 m.rstrip(' ')
                 self.msg(m)
+            elif a[0] == 'add':
+                re = self.re_quote_add.search(args)
+                if re:
+                    author = re.group(1)
+                    quote = re.group(2)
+                    details = re.group(4)
+                    q = Quote(author=author, quote=quote, details=details)
+                    db.add(q)
+                    db.commit()
+                    self.msg("Citation ajoutée pour %s : %s" % (author, quote))
+                else:
+                    self.msg("Commande incorrecte.")
             else:
                 random_quote = db.query(Quote).filter_by(author=a[0]).order_by(func.rand()).limit(1)
                 if random_quote.count() > 0:
