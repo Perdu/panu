@@ -94,6 +94,7 @@ class MUCBot(slixmpp.ClientXMPP):
 
 
         self.re_cmd = re.compile('^!(\w+)( +(.*))?')
+        self.re_ans = re.compile('^' + self.nick + '\s*[:,]')
         self.re_quote_add = re.compile('add\s+([^\s]+)\s+([^|]+)(\s*\|\s*(.*))?$')
         #self.re_cmd_args = re.compile('^!\w+ +(.*)')
 
@@ -148,14 +149,17 @@ class MUCBot(slixmpp.ClientXMPP):
         print('<' + msg['mucnick'] + "> | " + msg['body'])
         if msg['body'] == self.prev_msg and msg['mucnick'] != self.prev_author:
             self.msg(msg['body'])
-        s = self.re_cmd.search(msg['body'])
-        if s:
-            cmd_name = s.group(1)
-            args = s.group(3)
+        res_re_cmd = self.re_cmd.search(msg['body'])
+        if res_re_cmd:
+            cmd_name = res_re_cmd.group(1)
+            args = res_re_cmd.group(3)
             if cmd_name in self.cmds:
                 self.cmds[cmd_name].handler(args, msg)
             else:
                 self.msg("Commande inconnue.")
+        res_re_ans = self.re_ans.match(msg['body'])
+        if res_re_ans:
+            self.answer(msg)
         self.prev_msg = msg['body']
         self.prev_author = msg['mucnick']
 
@@ -182,6 +186,11 @@ class MUCBot(slixmpp.ClientXMPP):
 
     def convert_quote(self, quote, nick):
         return quote.replace("%%", nick)
+
+    def answer(self, msg):
+        quote = db.query(Quote).filter_by(author='answer').order_by(func.rand()).limit(1).all()
+        if len(quote) > 0:
+            self.msg(self.convert_quote(quote[0].quote, (msg['mucnick'])))
 
     def cmd_quote(self, args, msg):
         if args is not None and len(args) > 0:
