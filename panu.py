@@ -79,6 +79,12 @@ class Quote(Base):
     details = Column(String)
     quote = Column(String)
 
+class Definition(Base):
+    __tablename__ = "definitions"
+    def_id = Column(Integer, primary_key=True)
+    name = Column(String(100))
+    definition = Column(String(10000))
+
 class MUCBot(slixmpp.ClientXMPP):
     
     def __init__(self, jid, password, room, nick):
@@ -103,6 +109,7 @@ class MUCBot(slixmpp.ClientXMPP):
         self.re_ans = re.compile('^' + self.nick + '\s*[:,]')
         self.re_quote_add = re.compile('add\s+([^\s]+)\s+([^|]+)(\s*\|\s*(.*))?$')
         self.re_link = re.compile('(http(s)?:\/\/[^ ]+)')
+        self.re_def = re.compile('^!!\s*([-_\w\'’ ]+?)\s*=\s*(.*)\s*$')
 
         self.add_command('battle',
                          '!battle : sélectionne un choix au hasard',
@@ -166,6 +173,11 @@ class MUCBot(slixmpp.ClientXMPP):
         res_re_link = self.re_link.search(msg['body'])
         if res_re_link:
             self.shortener(res_re_link.group(1))
+            return
+        res_re_def = self.re_def.match(msg['body'])
+        if res_re_def:
+            self.add_def(res_re_def.group(1), res_re_def.group(2))
+            return
 
     def muc_message(self, msg):
         if msg['mucnick'] == self.nick:
@@ -314,6 +326,20 @@ class MUCBot(slixmpp.ClientXMPP):
                 self.msg("Oui !")
             else:
                 self.msg("Non !")
+
+    def add_def(self, name, definition):
+        prev_def = None
+        q_prev_def = db.query(Definition).filter(Definition.name==name).all()
+        if len(q_prev_def) > 0:
+            prev_def = q_prev_def[0].definition
+        d = Definition(name=name, definition=definition)
+        db.add(d)
+        db.commit()
+        if prev_def is not None:
+            self.msg("Définition ajoutée pour %s : %s\nDéfinition précédente : %s" %
+                     (name, definition, prev_def))
+        else:
+            self.msg("Définition ajoutée pour %s : %s" %w (name, definition))
 
 if __name__ == '__main__':
     parser = ArgumentParser()
