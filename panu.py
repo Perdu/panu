@@ -9,6 +9,10 @@ import slixmpp
 import sys
 import re
 import random
+import base64
+
+import urllib3
+import lxml.html
 
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
@@ -19,10 +23,12 @@ from  sqlalchemy.sql.expression import func
 # Dependencies:
 # python3-sqlalchemy
 # python3-mysqldb
+# python3-urllib3
 
 CONFIG_FILE = 'panu.conf'
 Base = declarative_base()
 db = None
+http = urllib3.PoolManager()
 
 class Config():
     def __init__(self, c):
@@ -96,7 +102,7 @@ class MUCBot(slixmpp.ClientXMPP):
         self.re_cmd = re.compile('^!(\w+)( +(.*))?')
         self.re_ans = re.compile('^' + self.nick + '\s*[:,]')
         self.re_quote_add = re.compile('add\s+([^\s]+)\s+([^|]+)(\s*\|\s*(.*))?$')
-        #self.re_cmd_args = re.compile('^!\w+ +(.*)')
+        self.re_link = re.compile('(http(s)?:\/\/[^ ]+)')
 
         self.add_command('battle',
                          '!battle : sélectionne un choix au hasard',
@@ -143,12 +149,7 @@ class MUCBot(slixmpp.ClientXMPP):
         if msg['mucnick'] != self.nick and msg['type'] == 'chat':
             print('Direct message from', msg['mucnick'] + ':', msg['body'])
 
-    def muc_message(self, msg):
-        if msg['mucnick'] == self.nick:
-            return
-        print('<' + msg['mucnick'] + "> | " + msg['body'])
-        if msg['body'] == self.prev_msg and msg['mucnick'] != self.prev_author:
-            self.msg(msg['body'])
+    def test_regexps(self, msg):
         res_re_cmd = self.re_cmd.search(msg['body'])
         if res_re_cmd:
             cmd_name = res_re_cmd.group(1)
@@ -157,9 +158,22 @@ class MUCBot(slixmpp.ClientXMPP):
                 self.cmds[cmd_name].handler(args, msg)
             else:
                 self.msg("Commande inconnue.")
+            return
         res_re_ans = self.re_ans.match(msg['body'])
         if res_re_ans:
             self.answer(msg)
+            return
+        res_re_link = self.re_link.search(msg['body'])
+        if res_re_link:
+            self.shortener(res_re_link.group(1))
+
+    def muc_message(self, msg):
+        if msg['mucnick'] == self.nick:
+            return
+        print('<' + msg['mucnick'] + "> | " + msg['body'])
+        if msg['body'] == self.prev_msg and msg['mucnick'] != self.prev_author:
+            self.msg(msg['body'])
+        self.test_regexps(msg)
         self.prev_msg = msg['body']
         self.prev_author = msg['mucnick']
 
@@ -183,6 +197,23 @@ class MUCBot(slixmpp.ClientXMPP):
     def add_command(self, name, description, handler):
         cmd = Command(description, handler)
         self.cmds[name] = cmd
+
+    def shortener(self, link):
+        r = http.request('GET', link)
+        if r.status != 200:
+            self.msg(str(r.status))
+            return
+        t = lxml.html.fromstring(r.data)
+        title_search = t.find(".//title")
+        if title_search is not None:
+            title = title_search.text
+        else:
+            title = ""
+        r = http.request('GET', config.shortener_url + '?url=' + base64.urlsafe_b64encode(link.encode('utf8')).decode('ascii'))
+        if r.status != 200:
+            self.msg(str(r.status))
+        else:
+            self.msg(config.shortener_external_url + r.data.decode('ascii') + ' ' + title)
 
     def convert_quote(self, quote, nick):
         return quote.replace("%%", nick)
