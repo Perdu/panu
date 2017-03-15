@@ -369,6 +369,7 @@ if __name__ == '__main__':
     #Base.metadata.create_all()
     Session = sessionmaker(bind=eng)
     db = Session()
+    Base.metadata.create_all(bind=eng)
 
     # Setup logging.
     logging.basicConfig(level=args.loglevel,
