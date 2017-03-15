@@ -61,8 +61,8 @@ class Config():
         self.min_number_for_talking = c.get('Other', 'min_number_for_talking')
         self.min_link_size = c.get('Other', 'min_link_size')
         self.max_title_size = c.get('Other', 'max_title_size')
-        self.mechanize_timeout = c.get('Other', 'mechanize_timeout')
-        self.mechanize_max_size = c.get('Other', 'mechanize_max_size')
+        self.url_shortener_timeout = c.get('Other', 'url_shortener_timeout')
+        self.url_shortener_max_size = c.get('Other', 'url_shortener_max_size')
         self.min_word_length = c.get('Other', 'min_word_length')
         self.joke_points_max_display = c.get('Other', 'joke_points_max_display')
         self.nb_prev_msg = c.get('Other', 'nb_prev_msg_for_related')
@@ -199,7 +199,7 @@ class MUCBot(slixmpp.ClientXMPP):
         self.cmds[name] = cmd
 
     def shortener(self, link):
-        r = http.request('GET', link)
+        r = http.request('GET', link, timeout=config.url_shortener_timeout)
         if r.status != 200:
             self.msg(str(r.status))
             return
