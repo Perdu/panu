@@ -110,6 +110,7 @@ class MUCBot(slixmpp.ClientXMPP):
         self.re_quote_add = re.compile('add\s+([^\s]+)\s+([^|]+)(\s*\|\s*(.*))?$')
         self.re_link = re.compile('(http(s)?:\/\/[^ ]+)')
         self.re_def = re.compile('^!!\s*([-_\w\'’ ]+?)\s*=\s*(.*)\s*$')
+        self.re_show_def = re.compile('\?\?\s*([-_\w\'’ ]+?)\s*$')
 
         self.add_command('battle',
                          '!battle : sélectionne un choix au hasard',
@@ -177,6 +178,10 @@ class MUCBot(slixmpp.ClientXMPP):
         res_re_def = self.re_def.match(msg['body'])
         if res_re_def:
             self.add_def(res_re_def.group(1), res_re_def.group(2))
+            return
+        res_re_show_def = self.re_show_def.match(msg['body'])
+        if res_re_show_def:
+            self.show_def(res_re_show_def.group(1))
             return
 
     def muc_message(self, msg):
@@ -340,6 +345,13 @@ class MUCBot(slixmpp.ClientXMPP):
                      (name, definition, prev_def))
         else:
             self.msg("Définition ajoutée pour %s : %s" %w (name, definition))
+
+    def show_def(self, name):
+        q_def = db.query(Definition).filter(Definition.name==name).all()
+        if len(q_def) > 0:
+            self.msg('%s : %s ' % (name, q_def[0].definition))
+        else:
+            self.msg('%s : Non défini' % name)
 
 if __name__ == '__main__':
     parser = ArgumentParser()
