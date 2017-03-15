@@ -75,9 +75,9 @@ class Command():
 class Quote(Base):
     __tablename__ = "quotes"
     quote_id = Column(Integer, primary_key=True)
-    author = Column(String)
-    details = Column(String)
-    quote = Column(String)
+    author = Column(String(100))
+    details = Column(String(1000))
+    quote = Column(String(10000))
 
 class Definition(Base):
     __tablename__ = "definitions"
