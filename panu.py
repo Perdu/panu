@@ -79,6 +79,10 @@ class Quote(Base):
     details = Column(String(1000))
     quote = Column(String(10000))
 
+    def __init__(self, author, details):
+        self.author = author
+        self.details = details
+
 class Definition(Base):
     __tablename__ = "definitions"
     def_id = Column(Integer, primary_key=True)
@@ -95,8 +99,7 @@ class MUCBot(slixmpp.ClientXMPP):
         self.nick = nick
         self.prev_msg = ""
         self.prev_author = ""
-        self.prev_quote_author = ""
-        self.prev_quote_details = ""
+        self.prev_quote = Quote(None, None)
         self.prev_related_quote_word = ""
         self.cmds = {}
         self.quiet = False
@@ -287,8 +290,8 @@ class MUCBot(slixmpp.ClientXMPP):
                 if len(random_quote) > 0:
                     quote = self.convert_quote(random_quote[0].quote, msg['mucnick'])
                     self.msg(quote + ' (?/' + str(nb_quotes_by_author) + ')')
-                    self.prev_quote_author = random_quote[0].author
-                    self.prev_quote_details = random_quote[0].details
+                    self.prev_quote.author = random_quote[0].author
+                    self.prev_quote.details = random_quote[0].details
                 else:
                     self.msg('Aucune citation trouvée pour %s.' % a[0])
         else:
@@ -296,8 +299,8 @@ class MUCBot(slixmpp.ClientXMPP):
             if len(random_quote) > 0:
                 quote = self.convert_quote(random_quote[0].quote, msg['mucnick'])
                 self.msg(quote)
-                self.prev_quote_author = random_quote[0].author
-                self.prev_quote_details = random_quote[0].details
+                self.prev_quote.author = random_quote[0].author
+                self.prev_quote.details = random_quote[0].details
                 print(random_quote[0].author, random_quote[0].details)
             else:
                 self.msg('Aucune citation connue. Ajoutez-en avec !quote add')
@@ -328,10 +331,11 @@ class MUCBot(slixmpp.ClientXMPP):
             self.msg(msg['mucnick'] + ': ' + choice)
 
     def cmd_who(self, args, msg):
-        ans = self.prev_quote_author
-        if self.prev_quote_details is not None:
-            ans += ' (' + self.prev_quote_details + ')'
-        self.msg(ans)
+        ans = self.prev_quote.author
+        if ans is not None:
+            if self.prev_quote.details is not None:
+                ans += ' (' + self.prev_quote.details + ')'
+            self.msg(ans)
 
     def cmd_why(self, args, msg):
         if self.prev_related_quote_word != "":
@@ -340,10 +344,10 @@ class MUCBot(slixmpp.ClientXMPP):
             self.msg("Unrelated.")
 
     def cmd_isit(self, args, msg):
-        if self.prev_quote_author in ["answer", "random"]:
+        if self.prev_quote.author in ["answer", "random"]:
             self.msg("Ne cherche pas, je n'en sais rien !")
         else:
-            if args == self.prev_quote_author:
+            if args == self.prev_quote.author:
                 self.msg("Oui !")
             else:
                 self.msg("Non !")
