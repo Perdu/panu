@@ -97,6 +97,7 @@ class MUCBot(slixmpp.ClientXMPP):
         self.prev_author = ""
         self.prev_quote_author = ""
         self.prev_quote_details = ""
+        self.prev_related_quote_word = ""
         self.cmds = {}
         self.quiet = False
         # Probability of talking.
@@ -111,6 +112,7 @@ class MUCBot(slixmpp.ClientXMPP):
         self.re_link = re.compile('(http(s)?:\/\/[^ ]+)')
         self.re_def = re.compile('^!!\s*([-_\w\'’ ]+?)\s*=\s*(.*)\s*$')
         self.re_show_def = re.compile('\?\?\s*([-_\w\'’ ]+?)\s*$')
+        self.re_get_words = re.compile('(\w{' + config.min_word_length + ',})(?:[ ,\.\-\']|$)')
 
         self.add_command('battle',
                          '!battle : sélectionne un choix au hasard',
@@ -130,6 +132,9 @@ class MUCBot(slixmpp.ClientXMPP):
         self.add_command('who',
                          '!who : Indique de qui est la citation précédente.',
                          self.cmd_who)
+        self.add_command('why',
+                         '!why : Indique ce qui a provoqué la citation précédente.',
+                         self.cmd_why)
         self.add_event_handler("session_start", self.start)
         self.add_event_handler("groupchat_message", self.muc_message)
         self.add_event_handler("message", self.direct_message)   
@@ -191,6 +196,11 @@ class MUCBot(slixmpp.ClientXMPP):
         if msg['body'] == self.prev_msg and msg['mucnick'] != self.prev_author:
             self.msg(msg['body'])
         self.test_regexps(msg)
+        related_quote, word = self.find_related_quote([msg['body']])
+        if related_quote != None:
+            self.msg(related_quote.quote)
+            self.prev_quote_author = related_quote.author
+            self.prev_related_quote_word = word
         self.prev_msg = msg['body']
         self.prev_author = msg['mucnick']
 
@@ -323,6 +333,12 @@ class MUCBot(slixmpp.ClientXMPP):
             ans += ' (' + self.prev_quote_details + ')'
         self.msg(ans)
 
+    def cmd_why(self, args, msg):
+        if self.prev_related_quote_word != "":
+            self.msg(self.prev_related_quote_word)
+        else:
+            self.msg("Unrelated.")
+
     def cmd_isit(self, args, msg):
         if self.prev_quote_author in ["answer", "random"]:
             self.msg("Ne cherche pas, je n'en sais rien !")
@@ -352,6 +368,23 @@ class MUCBot(slixmpp.ClientXMPP):
             self.msg('%s : %s ' % (name, q_def[0].definition))
         else:
             self.msg('%s : Non défini' % name)
+
+    def find_related_quote(self, msgs):
+        for msg in msgs:
+            words = self.get_words(msg)
+            random.shuffle(words)
+            for word in words:
+                quote = db.query(Quote).filter(Quote.quote.like('%' + word + '%')).filter(Quote.quote!=msg).order_by(func.rand()).limit(1).all()
+                if len(quote) > 0:
+                    return quote[0], word
+        return None, None
+
+    def get_words(self, msg):
+        words = self.re_get_words.findall(msg)
+        if words is not None:
+            return words
+        else:
+            return []
 
 if __name__ == '__main__':
     parser = ArgumentParser()
