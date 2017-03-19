@@ -79,9 +79,10 @@ class Quote(Base):
     details = Column(String(1000))
     quote = Column(String(10000))
 
-    def __init__(self, author, details):
+    def __init__(self, author, details, quote=None):
         self.author = author
         self.details = details
+        self.quote = quote
 
 class Definition(Base):
     __tablename__ = "definitions"
