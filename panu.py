@@ -200,14 +200,10 @@ class MUCBot(slixmpp.ClientXMPP):
             prev_msgs.pop(0)
         return prev_msgs
 
-    def muc_message(self, msg):
-        if msg['mucnick'] == self.nick:
-            return
-        print('<' + msg['mucnick'] + "> | " + msg['body'])
+    def message_reaction(self, msg):
         if msg['body'] == self.prev_msg and msg['mucnick'] != self.prev_author:
             self.msg(msg['body'])
             return
-        self.prev_msgs = self.update_prev_msgs_list(msg['body'], self.prev_msgs)
         if self.test_regexps(msg):
             return
         related_quote, word = self.find_related_quote(self.prev_msgs)
@@ -215,6 +211,14 @@ class MUCBot(slixmpp.ClientXMPP):
             self.msg(related_quote.quote)
             self.prev_quote_author = related_quote.author
             self.prev_related_quote_word = word
+            return
+
+    def muc_message(self, msg):
+        if msg['mucnick'] == self.nick:
+            return
+        print('<' + msg['mucnick'] + "> | " + msg['body'])
+        self.prev_msgs = self.update_prev_msgs_list(msg['body'], self.prev_msgs)
+        self.message_reaction(msg)
         self.prev_msg = msg['body']
         self.prev_author = msg['mucnick']
 
