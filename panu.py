@@ -134,6 +134,9 @@ class MUCBot(slixmpp.ClientXMPP):
         self.add_command('isit',
                          '!isit <nick> : Deviner de qui est la citation précédente.',
                          self.cmd_isit)
+        self.add_command('related',
+                         '!related : Donne une citation en rapport.',
+                         self.cmd_related)
         self.add_command('who',
                          '!who : Indique de qui est la citation précédente.',
                          self.cmd_who)
@@ -201,17 +204,22 @@ class MUCBot(slixmpp.ClientXMPP):
             prev_msgs.pop(0)
         return prev_msgs
 
+    def search_and_answer_related_quote(self, msg):
+        related_quote, word = self.find_related_quote(self.prev_msgs)
+        if related_quote != None:
+            self.msg(self.convert_quote(related_quote.quote, msg['mucnick']))
+            self.prev_quote_author = related_quote.author
+            self.prev_related_quote_word = word
+            return True
+        return False
+
     def message_reaction(self, msg):
         if msg['body'] == self.prev_msg and msg['mucnick'] != self.prev_author:
             self.msg(msg['body'])
             return
         if self.test_regexps(msg):
             return
-        related_quote, word = self.find_related_quote(self.prev_msgs)
-        if related_quote != None:
-            self.msg(self.convert_quote(related_quote.quote, msg['mucnick']))
-            self.prev_quote_author = related_quote.author
-            self.prev_related_quote_word = word
+        if self.search_and_answer_related_quote(msg):
             return
 
     def muc_message(self, msg):
@@ -367,6 +375,10 @@ class MUCBot(slixmpp.ClientXMPP):
                 self.msg("Oui !")
             else:
                 self.msg("Non !")
+
+    def cmd_related(self, args, msg):
+        if not self.search_and_answer_related_quote(msg):
+            self.msg("Aucune citation trouvée.")
 
     def add_def(self, name, definition):
         prev_def = None
