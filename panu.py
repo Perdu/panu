@@ -65,7 +65,7 @@ class Config():
         self.url_shortener_max_size = c.get('Other', 'url_shortener_max_size')
         self.min_word_length = c.get('Other', 'min_word_length')
         self.joke_points_max_display = c.get('Other', 'joke_points_max_display')
-        self.nb_prev_msg = c.get('Other', 'nb_prev_msg_for_related')
+        self.nb_prev_msg = c.getint('Other', 'nb_prev_msg_for_related')
 
 class Command():
     def __init__(self, description, handler):
