@@ -209,7 +209,7 @@ class MUCBot(slixmpp.ClientXMPP):
             return
         related_quote, word = self.find_related_quote(self.prev_msgs)
         if related_quote != None:
-            self.msg(related_quote.quote)
+            self.msg(self.convert_quote(related_quote.quote, msg['mucnick']))
             self.prev_quote_author = related_quote.author
             self.prev_related_quote_word = word
             return
