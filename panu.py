@@ -103,6 +103,7 @@ class MUCBot(slixmpp.ClientXMPP):
         self.prev_related_quote_word = ""
         self.cmds = {}
         self.quiet = False
+        self.prev_msgs = []
         # Probability of talking.
         # Defaults to 0, gains 0.1 every message. Can be decreased when the bot is told
         # to shut up.
@@ -174,23 +175,30 @@ class MUCBot(slixmpp.ClientXMPP):
                 self.cmds[cmd_name].handler(args, msg)
             else:
                 self.msg("Commande inconnue.")
-            return
+            return True
         res_re_ans = self.re_ans.match(msg['body'])
         if res_re_ans:
             self.answer(msg)
-            return
+            return True
         res_re_link = self.re_link.search(msg['body'])
         if res_re_link:
             self.shortener(res_re_link.group(1))
-            return
+            return True
         res_re_def = self.re_def.match(msg['body'])
         if res_re_def:
             self.add_def(res_re_def.group(1), res_re_def.group(2))
-            return
+            return True
         res_re_show_def = self.re_show_def.match(msg['body'])
         if res_re_show_def:
             self.show_def(res_re_show_def.group(1))
-            return
+            return True
+        return False
+
+    def update_prev_msgs_list(self, msg, prev_msgs):
+        prev_msgs.append(msg)
+        if len(prev_msgs) > config.nb_prev_msg:
+            prev_msgs.pop(0)
+        return prev_msgs
 
     def muc_message(self, msg):
         if msg['mucnick'] == self.nick:
@@ -198,8 +206,11 @@ class MUCBot(slixmpp.ClientXMPP):
         print('<' + msg['mucnick'] + "> | " + msg['body'])
         if msg['body'] == self.prev_msg and msg['mucnick'] != self.prev_author:
             self.msg(msg['body'])
-        self.test_regexps(msg)
-        related_quote, word = self.find_related_quote([msg['body']])
+            return
+        self.prev_msgs = self.update_prev_msgs_list(msg['body'], self.prev_msgs)
+        if self.test_regexps(msg):
+            return
+        related_quote, word = self.find_related_quote(self.prev_msgs)
         if related_quote != None:
             self.msg(related_quote.quote)
             self.prev_quote_author = related_quote.author
