@@ -142,6 +142,9 @@ class MUCBot(slixmpp.ClientXMPP):
         self.add_command('related',
                          '!related : Donne une citation en rapport.',
                          self.cmd_related)
+        self.add_command('speak',
+                         '!speak [less|more|<nombre>] : diminue/augmente la fréquence des citations aléatoires.',
+                         self.cmd_speak)
         self.add_command('who',
                          '!who : Indique de qui est la citation précédente.',
                          self.cmd_who)
@@ -404,6 +407,22 @@ class MUCBot(slixmpp.ClientXMPP):
     def cmd_related(self, args, msg):
         if not self.search_and_answer_related_quote(msg):
             self.msg("Aucune citation trouvée.")
+
+    def cmd_speak(self, args, msg):
+        ok = True
+        if args is not None:
+            if args == 'less':
+                config.min_number_for_talking = int(1.2 * config.min_number_for_talking)
+            elif args == 'more':
+                config.min_number_for_talking = int(0.8 * config.min_number_for_talking)
+            else:
+                try:
+                    config.min_number_for_talking = int(args)
+                except ValueError:
+                    self.msg('Syntaxe : !speak [less|more|<nombre>]')
+                    ok = False
+        if ok:
+            self.msg('Cap fixé à %s.' % config.min_number_for_talking)
 
     def add_def(self, name, definition):
         prev_def = None
