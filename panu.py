@@ -106,6 +106,7 @@ class MUCBot(slixmpp.ClientXMPP):
         self.quiet = False
         self.prev_msgs = []
         self.cyber_proba = 0
+        self.supplementary_doc = []
         # Probability of talking.
         # Defaults to 0, gains 0.1 every message. Can be decreased when the bot is told
         # to shut up.
@@ -147,6 +148,8 @@ class MUCBot(slixmpp.ClientXMPP):
         self.add_command('why',
                          '!why : Indique ce qui a provoqué la citation précédente.',
                          self.cmd_why)
+        self.supplementary_doc.append('!! <nom> = <def> : ajouter une définition')
+        self.supplementary_doc.append('?? <nom> : lire une définition')
         self.add_event_handler("session_start", self.start)
         self.add_event_handler("groupchat_message", self.muc_message)
         self.add_event_handler("message", self.direct_message)   
@@ -351,6 +354,8 @@ class MUCBot(slixmpp.ClientXMPP):
         help_message = ""
         for cmd in self.cmds:
             help_message += self.cmds[cmd].description + "\n"
+        for doc in self.supplementary_doc:
+            help_message += doc + "\n"
         self.msg(help_message.rstrip())
 
     def cmd_battle(self, args, msg):
