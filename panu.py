@@ -58,7 +58,7 @@ class Config():
         self.bot_nick = c.get('Other', 'bot_nick')
         self.admin = c.get('Other', 'admin')
         self.last_author = c.get('Other', 'sentence_no_author')
-        self.min_number_for_talking = c.get('Other', 'min_number_for_talking')
+        self.min_number_for_talking = c.getint('Other', 'min_number_for_talking')
         self.min_link_size = c.get('Other', 'min_link_size')
         self.max_title_size = c.get('Other', 'max_title_size')
         self.url_shortener_timeout = c.getfloat('Other', 'url_shortener_timeout')
@@ -212,10 +212,21 @@ class MUCBot(slixmpp.ClientXMPP):
         related_quote, word = self.find_related_quote(self.prev_msgs)
         if related_quote != None:
             self.msg(self.convert_quote(related_quote.quote, msg['mucnick']))
-            self.prev_quote_author = related_quote.author
+            self.prev_quote.author = related_quote.author
             self.prev_related_quote_word = word
             return True
         return False
+
+    def random_quote(self, msg, answer=False):
+        random_quote = db.query(Quote).order_by(func.rand()).limit(1).all()
+        if len(random_quote) > 0:
+            quote = self.convert_quote(random_quote[0].quote, msg['mucnick'])
+            self.msg(quote)
+            self.prev_quote.author = random_quote[0].author
+            self.prev_quote.details = random_quote[0].details
+            self.prev_related_quote_word = ""
+        elif answer:
+            self.msg('Aucune citation connue. Ajoutez-en avec !quote add')
 
     def message_reaction(self, msg):
         if msg['body'] == self.prev_msg and msg['mucnick'] != self.prev_author:
@@ -223,8 +234,10 @@ class MUCBot(slixmpp.ClientXMPP):
             return
         if self.test_regexps(msg):
             return
-        if self.search_and_answer_related_quote(msg):
-            return
+        self.p += 1
+        if random.randint(0, config.min_number_for_talking) < self.p:
+            if not self.search_and_answer_related_quote(msg):
+                self.random_quote(msg, answer=False)
 
     def muc_message(self, msg):
         if msg['mucnick'] == self.nick:
@@ -325,15 +338,7 @@ class MUCBot(slixmpp.ClientXMPP):
                 else:
                     self.msg('Aucune citation trouvée pour %s.' % a[0])
         else:
-            random_quote = db.query(Quote).order_by(func.rand()).limit(1).all()
-            if len(random_quote) > 0:
-                quote = self.convert_quote(random_quote[0].quote, msg['mucnick'])
-                self.msg(quote)
-                self.prev_quote.author = random_quote[0].author
-                self.prev_quote.details = random_quote[0].details
-                print(random_quote[0].author, random_quote[0].details)
-            else:
-                self.msg('Aucune citation connue. Ajoutez-en avec !quote add')
+            self.random_quote(msg, answer=True)
 
     def cmd_quiet(self, args, msg):
         if not self.quiet:
