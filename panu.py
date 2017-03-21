@@ -59,12 +59,12 @@ class Config():
         self.admin = c.get('Other', 'admin')
         self.last_author = c.get('Other', 'sentence_no_author')
         self.min_number_for_talking = c.getint('Other', 'min_number_for_talking')
-        self.min_link_size = c.get('Other', 'min_link_size')
-        self.max_title_size = c.get('Other', 'max_title_size')
+        self.min_link_size = c.getint('Other', 'min_link_size')
+        self.max_title_size = c.getint('Other', 'max_title_size')
         self.url_shortener_timeout = c.getfloat('Other', 'url_shortener_timeout')
-        self.url_shortener_max_size = c.get('Other', 'url_shortener_max_size')
-        self.min_word_length = c.get('Other', 'min_word_length')
-        self.joke_points_max_display = c.get('Other', 'joke_points_max_display')
+        self.url_shortener_max_size = c.getint('Other', 'url_shortener_max_size')
+        self.min_word_length = c.getint('Other', 'min_word_length')
+        self.joke_points_max_display = c.getint('Other', 'joke_points_max_display')
         self.nb_prev_msg = c.getint('Other', 'nb_prev_msg_for_related')
 
 class Command():
@@ -118,7 +118,7 @@ class MUCBot(slixmpp.ClientXMPP):
         self.re_link = re.compile('(http(s)?:\/\/[^ ]+)')
         self.re_def = re.compile('^!!\s*([-_\w\'’ ]+?)\s*=\s*(.*)\s*$')
         self.re_show_def = re.compile('\?\?\s*([-_\w\'’ ]+?)\s*$')
-        self.re_get_words = re.compile('(\w{' + config.min_word_length + ',})(?:[ ,\.\-\']|$)')
+        self.re_get_words = re.compile('(\w{' + str(config.min_word_length) + ',})(?:[ ,\.\-\']|$)')
 
         self.add_command('battle',
                          '!battle : sélectionne un choix au hasard',
