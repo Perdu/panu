@@ -105,6 +105,7 @@ class MUCBot(slixmpp.ClientXMPP):
         self.cmds = {}
         self.quiet = False
         self.prev_msgs = []
+        self.cyber_proba = 0
         # Probability of talking.
         # Defaults to 0, gains 0.1 every message. Can be decreased when the bot is told
         # to shut up.
@@ -122,6 +123,9 @@ class MUCBot(slixmpp.ClientXMPP):
         self.add_command('battle',
                          '!battle : sélectionne un choix au hasard',
                          self.cmd_battle)
+        self.add_command('cyber',
+                         '!cyber [<proba>] : Active le cyber-mode cyber.',
+                         self.cmd_cyber)
         self.add_command('quote',
                          '!quote [add] [<nick>] [recherche] : Citation aléatoire.',
                          self.cmd_quote)
@@ -245,6 +249,8 @@ class MUCBot(slixmpp.ClientXMPP):
 
     def msg(self, text):
         if not self.quiet:
+            if self.cyber_proba > 0:
+                text = self.cyberize(text, self.cyber_proba)
             self.send_message(mto=config.room_jid, mbody=text, mtype='groupchat')
             print(self.nick + ': ' + text)
 
@@ -354,6 +360,15 @@ class MUCBot(slixmpp.ClientXMPP):
         else:
             self.msg(msg['mucnick'] + ': ' + choice)
 
+    def cmd_cyber(self, args, msg):
+        if args is None:
+            self.msg('Syntaxe : cyber <probabilité>')
+        self.cyber_proba = float(args)
+        if self.cyber_proba == 0:
+            self.msg('Mode cyber désactivé.')
+        else:
+            self.msg('Mode cyber: probabilité définie à %s' % self.cyber_proba)
+
     def cmd_who(self, args, msg):
         ans = self.prev_quote.author
         if ans is not None:
@@ -417,6 +432,16 @@ class MUCBot(slixmpp.ClientXMPP):
             return words
         else:
             return []
+
+    def cyberize(self, text, cyber_proba):
+        res = ""
+        pres_pos = 0
+        for m in self.re_get_words.finditer(text):
+            if random.random() <= cyber_proba:
+                res += text[pres_pos:m.start()] + 'cyber'
+                pres_pos = m.start()
+        res += text[pres_pos:]
+        return res
 
 if __name__ == '__main__':
     parser = ArgumentParser()
