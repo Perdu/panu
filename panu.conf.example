@@ -48,15 +48,15 @@ min_number_for_talking = 2000
 min_link_size = 100
 # Display websites' title up to that length
 max_title_size = 200
-# Timeout for WWW::Mechanize (Max time to wait while a URL does not respond)
-mechanize_timeout = 10
+# Timeout for urllib3 (Max time to wait while a URL does not respond)
+url_shortener_timeout = 10
 # Max size to download from URLs (1 MB)
-mechanize_max_size = 1000000
+url_shortener_max_size = 1000000
 # The minimum length for a word to be cyber-ized
 min_word_length = 5
 # Number of previous messages to consider for !related
 nb_prev_msg_for_related = 5
 # Sentence to write when a quote is requested and no quote has been issued yet.
-last_author = Le silence est d'or.
+sentence_no_author = Le silence est d'or.
 # Maximum number of people to display with command !pb
 joke_points_max_display = 10
