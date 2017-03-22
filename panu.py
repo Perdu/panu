@@ -325,7 +325,7 @@ class MUCBot(slixmpp.ClientXMPP):
             if a[0] == 'list':
                 rs = db.query(Quote.author, func.count(Quote.author)).group_by(Quote.author)
                 m = ""
-                rs = sorted(rs, key=lambda r: r[1])
+                rs = sorted(rs, key=lambda r: r[1], reverse=True)
                 for r in rs:
                     nick = r[0]
                     # add '_' in the nick to prevent HL
