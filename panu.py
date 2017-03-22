@@ -39,16 +39,11 @@ class Config():
         self.password = c.get('Connexion', 'pass')
         self.room_jid = self.room + '@' + self.server
 
-        self.joke_points_file = c.get('Paths', 'joke_points_file')
-        self.dir_defs = c.get('Paths', 'dir_defs')
-        self.dir_quotes = c.get('Paths', 'dir_quotes')
-        self.file_philosophy = c.get('Paths', 'file_philosophy')
         self.fifopath = c.get('Paths', 'fifopath')
         self.shortener_url = c.get('Paths', 'shortener_url')
         self.shortener_external_url = c.get('Paths', 'shortener_external_url')
         self.quotes_server_port = c.get('Paths', 'quotes_server_port')
         self.quotes_external_url = c.get('Paths', 'quotes_external_url') + self.quotes_server_port
-        self.file_features = c.get('Paths', 'file_features')
 
         self.db_name = c.get('Database', 'db_name')
         self.db_server = c.get('Database', 'db_server')
