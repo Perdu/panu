@@ -147,7 +147,7 @@ class MUCBot(slixmpp.ClientXMPP):
                          '!isit <nick> : Deviner de qui est la citation précédente.',
                          self.cmd_isit)
         self.add_command('pb',
-                         '!pb [nick|date] : affiche les points-blague\n.',
+                         '!pb [nick|date] : affiche les points-blague.',
                          self.cmd_pb)
         self.add_command('related',
                          '!related : Donne une citation en rapport.',
