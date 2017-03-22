@@ -483,6 +483,11 @@ class MUCBot(slixmpp.ClientXMPP):
                 db.add(f)
                 db.commit()
                 self.msg('Feature request ajoutée : %s' % f.description)
+            elif a[0] == 'del' and len(a) > 1:
+                description=' '.join(a[1:])
+                q = db.query(Feature).filter(Feature.description==description).delete(synchronize_session='evaluate')
+                db.commit()
+                self.msg('Feature request supprimée : %s' % description)
         else:
             self.msg('Syntaxe : !feature add|list')
 
