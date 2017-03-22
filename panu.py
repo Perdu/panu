@@ -96,6 +96,11 @@ class JokePoints(Base):
     nb_points = Column(Integer)
     date = Column(DateTime)
 
+class Feature(Base):
+    __tablename__ = "features"
+    feature_id = Column(Integer, primary_key=True)
+    description = Column(String(1000))
+
 class MUCBot(slixmpp.ClientXMPP):
     
     def __init__(self, jid, password, room, nick):
@@ -138,6 +143,9 @@ class MUCBot(slixmpp.ClientXMPP):
         self.add_command('cancel',
                          '!cancel : Annule l\'ajout d\'une citation.',
                          self.cmd_cancel)
+        self.add_command('feature',
+                         '!feature add|list : ajouter une demande de feature ou lister toutes les demandes.',
+                         self.cmd_feature)
         self.add_command('quote',
                          '!quote [add] [<nick>] [recherche] : Citation aléatoire.',
                          self.cmd_quote)
@@ -456,6 +464,27 @@ class MUCBot(slixmpp.ClientXMPP):
         else:
             jp = db.query(JokePoints.laugher, func.sum(JokePoints.nb_points)).filter(JokePoints.joker==args).group_by(JokePoints.joker)
             self.display_result_list(jp)
+
+    def cmd_feature(self, args, msg):
+        if args is not None:
+            a = args.split()
+            if a[0] == 'list':
+                features = db.query(Feature).all()
+                m = ""
+                for f in features:
+                    m += f.description + "\n"
+                m = m.rstrip()
+                if m != "":
+                    self.msg(m)
+                else:
+                    self.msg("Aucune feature request. %s est parfait !" % self.nick)
+            elif a[0] == 'add' and len(a) > 1:
+                f = Feature(description=' '.join(a[1:]))
+                db.add(f)
+                db.commit()
+                self.msg('Feature request ajoutée : %s' % f.description)
+        else:
+            self.msg('Syntaxe : !feature add|list')
 
     def display_result_list(self, query):
         # query is a list of elements containing a nick ([0]) and a number ([1])
