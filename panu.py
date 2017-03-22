@@ -457,6 +457,19 @@ class MUCBot(slixmpp.ClientXMPP):
                 m += nick + ' (' + str(r[1]) + ') '
             m.strip(' ')
             self.msg(m)
+        else:
+            jp = db.query(JokePoints.laugher, func.sum(JokePoints.nb_points)).filter(JokePoints.joker==args).group_by(JokePoints.joker)
+            jp = sorted(jp, key=lambda r: r[1], reverse=True)
+            m = ""
+            for r in jp:
+                nick = r[0]
+                # add '_' in the nick to prevent HL
+                if nick in self.userlist and len(nick) > 1:
+                    nick = nick[0] + '_' + nick[1:]
+                m += nick + ' (' + str(r[1]) + ') '
+            m.strip(' ')
+            self.msg(m)
+
 
     def add_def(self, name, definition):
         prev_def = None
