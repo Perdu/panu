@@ -24,7 +24,7 @@ from  sqlalchemy.sql.expression import func
 # Dependencies:
 # slixmpp
 # python3-sqlalchemy (debian) / python-sqlalchemy (archlinux)
-# python3-mysqldb (debian)
+# python3-mysqldb (debian) / mysqlclient from pip (archlinux)
 # python3-urllib3 (debian) / python-urllib3 (archlinux)
 # python-lxml (archlinux)
 
