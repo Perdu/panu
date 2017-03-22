@@ -290,6 +290,7 @@ class MUCBot(slixmpp.ClientXMPP):
                 text = self.cyberize(text, self.cyber_proba)
             self.send_message(mto=config.room_jid, mbody=text, mtype='groupchat')
             print(self.nick + ': ' + text)
+            self.update_prev_msgs_list(text, self.prev_msgs)
 
     def add_command(self, name, description, handler):
         cmd = Command(description, handler)
