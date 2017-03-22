@@ -368,6 +368,7 @@ class MUCBot(slixmpp.ClientXMPP):
             return
         q = db.query(Quote).filter(Quote.author==l.author, Quote.quote==l.quote, Quote.details==l.details).delete(synchronize_session='evaluate')
         db.commit()
+        self.last_added_quote = None
         self.msg('Citation supprimée : %s' % l.quote)
 
     def cmd_quiet(self, args, msg):
