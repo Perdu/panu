@@ -388,7 +388,7 @@ class MUCBot(slixmpp.ClientXMPP):
 
     def cmd_help(self, args, msg):
         help_message = ""
-        for cmd in self.cmds:
+        for cmd in sorted(self.cmds):
             help_message += self.cmds[cmd].description + "\n"
         for doc in self.supplementary_doc:
             help_message += doc + "\n"
