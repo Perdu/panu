@@ -22,9 +22,11 @@ from sqlalchemy.orm import sessionmaker
 from  sqlalchemy.sql.expression import func
 
 # Dependencies:
-# python3-sqlalchemy
-# python3-mysqldb
-# python3-urllib3
+# slixmpp
+# python3-sqlalchemy (debian) / python-sqlalchemy (archlinux)
+# python3-mysqldb (debian)
+# python3-urllib3 (debian) / python-urllib3 (archlinux)
+# python-lxml (archlinux)
 
 CONFIG_FILE = 'panu.conf'
 Base = declarative_base()
