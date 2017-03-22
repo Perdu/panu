@@ -10,6 +10,7 @@ import sys
 import re
 import random
 import base64
+import datetime
 
 import urllib3
 import lxml.html
@@ -509,7 +510,7 @@ class MUCBot(slixmpp.ClientXMPP):
         if joker == None or joker == laugher:
             # todo: also test aliases here
             return
-        j = JokePoints(joker=joker, laugher=laugher, nb_points=nb_points) # + date
+        j = JokePoints(joker=joker, laugher=laugher, nb_points=nb_points, date=datetime.datetime.now())
         db.add(j)
         db.commit()
         print("+%s points blague pour %s de %s" % (nb_points, joker, laugher))
