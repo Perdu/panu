@@ -327,16 +327,7 @@ class MUCBot(slixmpp.ClientXMPP):
             a = args.split()
             if a[0] == 'list':
                 rs = db.query(Quote.author, func.count(Quote.author)).group_by(Quote.author)
-                m = ""
-                rs = sorted(rs, key=lambda r: r[1], reverse=True)
-                for r in rs:
-                    nick = r[0]
-                    # add '_' in the nick to prevent HL
-                    if nick in self.userlist and len(nick) > 1:
-                        nick = nick[0] + '_' + nick[1:]
-                    m += nick + ' (' + str(r[1]) + ') '
-                m.rstrip(' ')
-                self.msg(m)
+                self.display_result_list(rs)
             elif a[0] == 'add':
                 re = self.re_quote_add.search(args)
                 if re:
@@ -447,29 +438,24 @@ class MUCBot(slixmpp.ClientXMPP):
     def cmd_pb(self, args, msg):
         if args == None:
             jp = db.query(JokePoints.joker, func.sum(JokePoints.nb_points)).group_by(JokePoints.joker)
-            jp = sorted(jp, key=lambda r: r[1], reverse=True)
-            m = ""
-            for r in jp:
-                nick = r[0]
-                # add '_' in the nick to prevent HL
-                if nick in self.userlist and len(nick) > 1:
-                    nick = nick[0] + '_' + nick[1:]
-                m += nick + ' (' + str(r[1]) + ') '
-            m.strip(' ')
-            self.msg(m)
+            self.display_result_list(jp)
         else:
             jp = db.query(JokePoints.laugher, func.sum(JokePoints.nb_points)).filter(JokePoints.joker==args).group_by(JokePoints.joker)
-            jp = sorted(jp, key=lambda r: r[1], reverse=True)
-            m = ""
-            for r in jp:
-                nick = r[0]
-                # add '_' in the nick to prevent HL
-                if nick in self.userlist and len(nick) > 1:
-                    nick = nick[0] + '_' + nick[1:]
-                m += nick + ' (' + str(r[1]) + ') '
-            m.strip(' ')
-            self.msg(m)
+            self.display_result_list(jp)
 
+    def display_result_list(self, query):
+        # query is a list of elements containing a nick ([0]) and a number ([1])
+        m = ""
+        sorted_query = sorted(query, key=lambda r: r[1], reverse=True)
+        for r in sorted_query:
+            nick = r[0]
+            # add '_' in the nick to prevent HL
+            if nick in self.userlist and len(nick) > 1:
+                nick = nick[0] + '_' + nick[1:]
+            m += nick + ' (' + str(r[1]) + ') '
+        m.strip(' ')
+        if m != "":
+            self.msg(m)
 
     def add_def(self, name, definition):
         prev_def = None
