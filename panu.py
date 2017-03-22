@@ -16,7 +16,7 @@ import lxml.html
 
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy.orm import sessionmaker
 from  sqlalchemy.sql.expression import func
 
@@ -90,6 +90,14 @@ class Definition(Base):
     name = Column(String(100))
     definition = Column(String(10000))
 
+class JokePoints(Base):
+    __tablename__ = "jokepoints"
+    jokepoints_id = Column(Integer, primary_key=True)
+    joker = Column(String(100))
+    laugher = Column(String(100))
+    nb_points = Column(Integer)
+    date = Column(DateTime)
+
 class MUCBot(slixmpp.ClientXMPP):
     
     def __init__(self, jid, password, room, nick):
@@ -111,7 +119,7 @@ class MUCBot(slixmpp.ClientXMPP):
         # Defaults to 0, gains 0.1 every message. Can be decreased when the bot is told
         # to shut up.
         self.p = 0
-
+        self.prev_joker = None
 
         self.re_cmd = re.compile('^!(\w+)( +(.*))?')
         self.re_ans = re.compile('^' + self.nick + '\s*[:,]')
@@ -120,6 +128,7 @@ class MUCBot(slixmpp.ClientXMPP):
         self.re_def = re.compile('^!!\s*([-_\w\'’ ]+?)\s*=\s*(.*)\s*$')
         self.re_show_def = re.compile('\?\?\s*([-_\w\'’ ]+?)\s*$')
         self.re_get_words = re.compile('(\w{' + str(config.min_word_length) + ',})(?:[ ,\.\-\']|$)')
+        self.re_jokepoints = re.compile('^[:xX]([Dd]+)')
 
         self.add_command('battle',
                          '!battle : sélectionne un choix au hasard',
@@ -181,6 +190,10 @@ class MUCBot(slixmpp.ClientXMPP):
             print('Direct message from', msg['mucnick'] + ':', msg['body'])
 
     def test_regexps(self, msg):
+        res_re_jokepoints = self.re_jokepoints.match(msg['body'])
+        if res_re_jokepoints:
+            self.add_jokepoints(self.prev_joker, msg['mucnick'], len(res_re_jokepoints.group(1)))
+            return True
         res_re_cmd = self.re_cmd.search(msg['body'])
         if res_re_cmd:
             cmd_name = res_re_cmd.group(1)
@@ -193,10 +206,7 @@ class MUCBot(slixmpp.ClientXMPP):
         res_re_ans = self.re_ans.match(msg['body'])
         if res_re_ans:
             self.answer(msg)
-            return True
-        res_re_link = self.re_link.search(msg['body'])
-        if res_re_link:
-            self.shortener(res_re_link.group(1))
+            self.prev_joker = self.nick
             return True
         res_re_def = self.re_def.match(msg['body'])
         if res_re_def:
@@ -205,6 +215,11 @@ class MUCBot(slixmpp.ClientXMPP):
         res_re_show_def = self.re_show_def.match(msg['body'])
         if res_re_show_def:
             self.show_def(res_re_show_def.group(1))
+            return True
+        self.prev_joker = msg['mucnick']
+        res_re_link = self.re_link.search(msg['body'])
+        if res_re_link:
+            self.shortener(res_re_link.group(1))
             return True
         return False
 
@@ -220,6 +235,7 @@ class MUCBot(slixmpp.ClientXMPP):
             self.msg(self.convert_quote(related_quote.quote, msg['mucnick']))
             self.prev_quote.author = related_quote.author
             self.prev_related_quote_word = word
+            self.prev_joker = related_quote.author
             return True
         return False
 
@@ -231,6 +247,7 @@ class MUCBot(slixmpp.ClientXMPP):
             self.prev_quote.author = random_quote[0].author
             self.prev_quote.details = random_quote[0].details
             self.prev_related_quote_word = ""
+            self.prev_joker = random_quote[0].author
         elif answer:
             self.msg('Aucune citation connue. Ajoutez-en avec !quote add')
 
@@ -471,6 +488,15 @@ class MUCBot(slixmpp.ClientXMPP):
                 pres_pos = m.start()
         res += text[pres_pos:]
         return res
+
+    def add_jokepoints(self, joker, laugher, nb_points):
+        if joker == None or joker == laugher:
+            # todo: also test aliases here
+            return
+        j = JokePoints(joker=joker, laugher=laugher, nb_points=nb_points) # + date
+        db.add(j)
+        db.commit()
+        print("+%s points blague pour %s de %s" % (nb_points, joker, laugher))
 
 if __name__ == '__main__':
     parser = ArgumentParser()
