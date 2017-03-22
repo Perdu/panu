@@ -118,6 +118,7 @@ class MUCBot(slixmpp.ClientXMPP):
         # to shut up.
         self.p = 0
         self.prev_joker = None
+        self.last_added_quote = None
 
         self.re_cmd = re.compile('^!(\w+)( +(.*))?')
         self.re_ans = re.compile('^' + self.nick + '\s*[:,]')
@@ -134,6 +135,9 @@ class MUCBot(slixmpp.ClientXMPP):
         self.add_command('cyber',
                          '!cyber [<proba>] : Active le cyber-mode cyber.',
                          self.cmd_cyber)
+        self.add_command('cancel',
+                         '!cancel : Annule l\'ajout d\'une citation.',
+                         self.cmd_cancel)
         self.add_command('quote',
                          '!quote [add] [<nick>] [recherche] : Citation aléatoire.',
                          self.cmd_quote)
@@ -337,8 +341,10 @@ class MUCBot(slixmpp.ClientXMPP):
                         self.msg("Citation déjà connue.")
                     else:
                         q = Quote(author=author, quote=quote, details=details)
+                        print(q, q.quote_id)
                         db.add(q)
                         db.commit()
+                        self.last_added_quote = q
                         self.msg("Citation ajoutée pour %s : %s" % (author, quote))
                 else:
                     self.msg("Commande incorrecte.")
@@ -355,6 +361,14 @@ class MUCBot(slixmpp.ClientXMPP):
                     self.msg('Aucune citation trouvée pour %s.' % a[0])
         else:
             self.random_quote(msg, answer=True)
+
+    def cmd_cancel(self, args, msg):
+        l = self.last_added_quote
+        if l is None:
+            return
+        q = db.query(Quote).filter(Quote.author==l.author, Quote.quote==l.quote, Quote.details==l.details).delete(synchronize_session='evaluate')
+        db.commit()
+        self.msg('Citation supprimée : %s' % l.quote)
 
     def cmd_quiet(self, args, msg):
         if not self.quiet:
