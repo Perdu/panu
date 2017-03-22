@@ -148,6 +148,9 @@ class MUCBot(slixmpp.ClientXMPP):
         self.add_command('isit',
                          '!isit <nick> : Deviner de qui est la citation précédente.',
                          self.cmd_isit)
+        self.add_command('pb',
+                         '!pb [nick|date] : affiche les points-blague\n.',
+                         self.cmd_pb)
         self.add_command('related',
                          '!related : Donne une citation en rapport.',
                          self.cmd_related)
@@ -440,6 +443,20 @@ class MUCBot(slixmpp.ClientXMPP):
                     ok = False
         if ok:
             self.msg('Cap fixé à %s.' % config.min_number_for_talking)
+
+    def cmd_pb(self, args, msg):
+        if args == None:
+            jp = db.query(JokePoints.joker, func.sum(JokePoints.nb_points)).group_by(JokePoints.joker)
+            jp = sorted(jp, key=lambda r: r[1], reverse=True)
+            m = ""
+            for r in jp:
+                nick = r[0]
+                # add '_' in the nick to prevent HL
+                if nick in self.userlist and len(nick) > 1:
+                    nick = nick[0] + '_' + nick[1:]
+                m += nick + ' (' + str(r[1]) + ') '
+            m.strip(' ')
+            self.msg(m)
 
     def add_def(self, name, definition):
         prev_def = None
