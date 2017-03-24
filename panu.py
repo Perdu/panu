@@ -249,6 +249,7 @@ class MUCBot(slixmpp.ClientXMPP):
             self.prev_quote.author = related_quote.author
             self.prev_related_quote_word = word
             self.prev_joker = related_quote.author
+            self.p = 0
             return True
         return False
 
@@ -261,6 +262,7 @@ class MUCBot(slixmpp.ClientXMPP):
             self.prev_quote.details = random_quote[0].details
             self.prev_related_quote_word = ""
             self.prev_joker = random_quote[0].author
+            self.p = 0
         elif answer:
             self.msg('Aucune citation connue. Ajoutez-en avec !quote add')
 
