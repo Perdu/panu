@@ -11,6 +11,8 @@ import re
 import random
 import base64
 import datetime
+import threading
+import os
 
 import urllib3
 import lxml.html
@@ -135,6 +137,10 @@ class MUCBot(slixmpp.ClientXMPP):
         self.re_get_words = re.compile('(\w{' + str(config.min_word_length) + ',})(?:[ ,\.\-\']|$)')
         self.re_jokepoints = re.compile('^[:xX]([Dd]+)')
 
+        self.fifo = config.fifopath
+        if self.create_fifo(self.fifo):
+            self.start_monitoring_fifo()
+
         self.add_command('battle',
                          '!battle : sélectionne un choix au hasard',
                          self.cmd_battle)
@@ -198,6 +204,26 @@ class MUCBot(slixmpp.ClientXMPP):
         self.get_roster()
         self.send_presence()
         self.plugin['xep_0045'].join_muc(self.room, self.nick, wait=True)
+
+    def create_fifo(self, path):
+        try:
+            if os.path.exists(path):
+                os.unlink(path)
+            os.mkfifo(path)
+            return True
+        except OSError as e:
+            print("Failed to create fifo : %s", e)
+        return False
+
+    def start_monitoring_fifo(self):
+        thread = threading.Thread(target=self.monitor_fifo)
+        #thread.setDaemon(True)
+        thread.start()
+
+    def monitor_fifo(self):
+        while True:
+            with open(self.fifo) as fifo:
+                self.msg(fifo.read().rstrip())
 
     def direct_message(self, msg):
         if msg['mucnick'] != self.nick and msg['type'] == 'chat':
