@@ -388,6 +388,16 @@ class MUCBot(slixmpp.ClientXMPP):
                         self.msg("Citation ajoutée pour %s : %s" % (author, quote))
                 else:
                     self.msg("Commande incorrecte.")
+            elif a[0] == 'search':
+                search = ' '.join(a[1:])
+                quotes = db.query(Quote).filter(Quote.quote.like('%' + search + '%')).all()
+                m = ""
+                self.prev_author = ""
+                for q in quotes:
+                    m += q.quote + "\n"
+                    #self.prev_quote.author += q.author
+                m = m.rstrip()
+                self.msg(m)
             else:
                 # quote <author>
                 random_quote = db.query(Quote).filter_by(author=a[0]).order_by(func.rand()).limit(1).all()
