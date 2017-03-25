@@ -156,6 +156,9 @@ class MUCBot(slixmpp.ClientXMPP):
         self.add_command('quote',
                          '!quote [add] [<nick>] [recherche] : Citation aléatoire.',
                          self.cmd_quote)
+        self.add_command('quotes',
+                         '!quotes <nick> : Donne toutes les citations d\'un auteur',
+                         self.cmd_quotes)
         self.add_command('quiet',
                          '!quiet : Rendre le bot silencieux.',
                          self.cmd_quiet)
@@ -398,6 +401,17 @@ class MUCBot(slixmpp.ClientXMPP):
                     self.msg('Aucune citation trouvée pour %s.' % a[0])
         else:
             self.random_quote(msg, answer=True)
+
+    def cmd_quotes(self, args, msg):
+        if args == None:
+            self.msg("Syntaxe : quotes <nick>")
+        else:
+            quotes = db.query(Quote).filter_by(author=args).all()
+            m = ""
+            for q in quotes:
+                m += q.quote + "\n"
+            m = m.rstrip()
+            self.msg(m)
 
     def cmd_cancel(self, args, msg):
         l = self.last_added_quote
