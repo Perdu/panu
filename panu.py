@@ -58,7 +58,7 @@ class Config():
 
         self.bot_nick = c.get('Other', 'bot_nick')
         self.admin = c.get('Other', 'admin')
-        self.last_author = c.get('Other', 'sentence_no_author')
+        self.sentence_no_author = c.get('Other', 'sentence_no_author')
         self.min_number_for_talking = c.getint('Other', 'min_number_for_talking')
         self.min_link_size = c.getint('Other', 'min_link_size')
         self.max_title_size = c.getint('Other', 'max_title_size')
@@ -393,6 +393,7 @@ class MUCBot(slixmpp.ClientXMPP):
                 quotes = db.query(Quote).filter(Quote.quote.like('%' + search + '%')).all()
                 m = ""
                 self.prev_quote.author = ""
+                self.prev_quote.details = None
                 for q in quotes:
                     m += q.quote + "\n"
                     self.prev_quote.author += q.author + ' '
@@ -476,11 +477,17 @@ class MUCBot(slixmpp.ClientXMPP):
             self.msg('Mode cyber: probabilité définie à %s' % self.cyber_proba)
 
     def cmd_who(self, args, msg):
-        ans = self.prev_quote.author
-        if ans is not None:
+        if self.prev_quote.author is not None:
+            t_ans = self.prev_quote.author.split()
+            ans = ""
+            for author in t_ans:
+                ans += self.anti_hl(author) + ' '
             if self.prev_quote.details is not None:
-                ans += ' (' + self.prev_quote.details + ')'
+                ans += '(' + self.prev_quote.details + ')'
+            ans = ans.rstrip(' ')
             self.msg(ans)
+        else:
+            self.msg(config.sentence_no_author)
 
     def cmd_why(self, args, msg):
         if self.prev_related_quote_word != "":
@@ -551,15 +558,18 @@ class MUCBot(slixmpp.ClientXMPP):
         else:
             self.msg('Syntaxe : !feature add|list')
 
+    def anti_hl(self, nick):
+        # add '_' in the nick to prevent HL
+        if nick in self.userlist and len(nick) > 1:
+            nick = nick[0] + '_' + nick[1:]
+        return nick
+
     def display_result_list(self, query):
         # query is a list of elements containing a nick ([0]) and a number ([1])
         m = ""
         sorted_query = sorted(query, key=lambda r: r[1], reverse=True)
         for r in sorted_query:
-            nick = r[0]
-            # add '_' in the nick to prevent HL
-            if nick in self.userlist and len(nick) > 1:
-                nick = nick[0] + '_' + nick[1:]
+            nick = self.anti_hl(r[0])
             m += nick + ' (' + str(r[1]) + ') '
         m.strip(' ')
         if m != "":
