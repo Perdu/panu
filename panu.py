@@ -392,11 +392,13 @@ class MUCBot(slixmpp.ClientXMPP):
                 search = ' '.join(a[1:])
                 quotes = db.query(Quote).filter(Quote.quote.like('%' + search + '%')).all()
                 m = ""
-                self.prev_author = ""
+                self.prev_quote.author = ""
                 for q in quotes:
                     m += q.quote + "\n"
+                    self.prev_quote.author += q.author + ' '
                     #self.prev_quote.author += q.author
                 m = m.rstrip()
+                m = m.rstrip(' ')
                 if m == "":
                     m = "Aucune citation trouvée."
                 self.msg(m)
