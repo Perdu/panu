@@ -490,7 +490,7 @@ class MUCBot(slixmpp.ClientXMPP):
         if self.prev_quote.author in ["answer", "random"]:
             self.msg("Ne cherche pas, je n'en sais rien !")
         else:
-            if args == self.prev_quote.author:
+            if args.lower() == self.prev_quote.author.lower():
                 self.msg("Oui !")
             else:
                 self.msg("Non !")
