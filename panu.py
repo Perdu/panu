@@ -397,6 +397,8 @@ class MUCBot(slixmpp.ClientXMPP):
                     m += q.quote + "\n"
                     #self.prev_quote.author += q.author
                 m = m.rstrip()
+                if m == "":
+                    m = "Aucune citation trouvée."
                 self.msg(m)
             else:
                 # quote <author>
