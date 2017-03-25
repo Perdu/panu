@@ -401,12 +401,15 @@ class MUCBot(slixmpp.ClientXMPP):
                     m = "Aucune citation trouvée."
                 self.msg(m)
             else:
-                # quote <author>
-                random_quote = db.query(Quote).filter_by(author=a[0]).order_by(func.rand()).limit(1).all()
+                # quote <author> [<author2>...]
+                random_quote = db.query(Quote).filter(Quote.author.in_(a)).order_by(func.rand()).limit(1).all()
                 nb_quotes_by_author = db.query(Quote).filter_by(author=a[0]).count()
                 if len(random_quote) > 0:
                     quote = self.convert_quote(random_quote[0].quote, msg['mucnick'])
-                    self.msg(quote + ' (?/' + str(nb_quotes_by_author) + ')')
+                    if len(a) == 1:
+                        self.msg(quote + ' (?/' + str(nb_quotes_by_author) + ')')
+                    else:
+                        self.msg(quote)
                     self.prev_quote.author = random_quote[0].author
                     self.prev_quote.details = random_quote[0].details
                 else:
