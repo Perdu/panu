@@ -33,8 +33,8 @@ from  sqlalchemy.sql.expression import func
 CONFIG_FILE = 'panu.conf'
 Base = declarative_base()
 db = None
-user_agent = {'user-agent': 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; FSL 7.0.6.01001)'}
 http = urllib3.PoolManager(headers=user_agent)
+user_agent = {'user-agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:34.0) Gecko/20100101 Firefox/34.0'}
 
 class Config():
     def __init__(self, c):
