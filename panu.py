@@ -587,7 +587,7 @@ class MUCBot(slixmpp.ClientXMPP):
             self.msg("Définition ajoutée pour %s : %s\nDéfinition précédente : %s" %
                      (name, definition, prev_def))
         else:
-            self.msg("Définition ajoutée pour %s : %s" %w (name, definition))
+            self.msg("Définition ajoutée pour %s : %s" % (name, definition))
 
     def show_def(self, name):
         q_def = db.query(Definition).filter(Definition.name==name).all()
