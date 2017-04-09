@@ -529,7 +529,7 @@ class MUCBot(slixmpp.ClientXMPP):
             jp = db.query(JokePoints.joker, func.sum(JokePoints.nb_points)).group_by(JokePoints.joker)
             self.display_result_list(jp)
         else:
-            jp = db.query(JokePoints.laugher, func.sum(JokePoints.nb_points)).filter(JokePoints.joker==args).group_by(JokePoints.joker)
+            jp = db.query(JokePoints.laugher, func.sum(JokePoints.nb_points)).filter(JokePoints.joker==args).group_by(JokePoints.laugher)
             self.display_result_list(jp)
 
     def cmd_feature(self, args, msg):
