@@ -16,6 +16,7 @@ import os
 
 import urllib3
 import lxml.html
+import certifi
 
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
@@ -29,12 +30,13 @@ from  sqlalchemy.sql.expression import func
 # python3-mysqldb (debian) / mysqlclient from pip (archlinux)
 # python3-urllib3 (debian) / python-urllib3 (archlinux)
 # python-lxml (archlinux)
+# python3-certifi (debian) / python-certifi (archlinux)
 
 CONFIG_FILE = 'panu.conf'
 Base = declarative_base()
 db = None
 user_agent = {'user-agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:34.0) Gecko/20100101 Firefox/34.0'}
-http = urllib3.PoolManager(headers=user_agent)
+http = urllib3.PoolManager(headers=user_agent, cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
 
 class Config():
     def __init__(self, c):
