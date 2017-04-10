@@ -348,7 +348,7 @@ class MUCBot(slixmpp.ClientXMPP):
         if r.status != 200:
             self.msg(str(r.status))
             return
-        t = lxml.html.fromstring(r.data)
+        t = lxml.html.fromstring(r.data.decode('UTF-8'))
         title_search = t.find(".//title")
         if title_search is not None:
             title = title_search.text
