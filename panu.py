@@ -343,6 +343,7 @@ class MUCBot(slixmpp.ClientXMPP):
         self.cmds[name] = cmd
 
     def shortener(self, link):
+        mess = ""
         r = http.request('GET', link, timeout=config.url_shortener_timeout)
         if r.status != 200:
             self.msg(str(r.status))
@@ -353,12 +354,13 @@ class MUCBot(slixmpp.ClientXMPP):
             title = title_search.text
         else:
             title = ""
-        r = http.request('GET', config.shortener_url + '?url=' + base64.b64encode(link.encode('utf8')).decode('ascii'))
-        print(config.shortener_url + '?url=' + base64.urlsafe_b64encode(link.encode('utf8')).decode('ascii'))
-        if r.status != 200:
-            self.msg(str(r.status))
-        else:
-            self.msg(config.shortener_external_url + r.data.decode('ascii') + ' ' + title)
+        if len(link) >= config.min_link_size or config.min_link_size == 0:
+            r = http.request('GET', config.shortener_url + '?url=' + base64.b64encode(link.encode('utf8')).decode('ascii'))
+            if r.status != 200:
+                print("Got a %s error code on the shortener" % r.status)
+            else:
+                mess += config.shortener_external_url + r.data.decode('ascii') + ' '
+        self.msg(mess + title)
 
     def convert_quote(self, quote, nick):
         return quote.replace("%%", nick)
