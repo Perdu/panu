@@ -353,7 +353,8 @@ class MUCBot(slixmpp.ClientXMPP):
             title = title_search.text
         else:
             title = ""
-        r = http.request('GET', config.shortener_url + '?url=' + base64.urlsafe_b64encode(link.encode('utf8')).decode('ascii'))
+        r = http.request('GET', config.shortener_url + '?url=' + base64.b64encode(link.encode('utf8')).decode('ascii'))
+        print(config.shortener_url + '?url=' + base64.urlsafe_b64encode(link.encode('utf8')).decode('ascii'))
         if r.status != 200:
             self.msg(str(r.status))
         else:
