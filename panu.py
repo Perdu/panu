@@ -502,10 +502,16 @@ class MUCBot(slixmpp.ClientXMPP):
 
     def cmd_isit(self, args, msg):
         if self.prev_quote.author in ["answer", "random"]:
-            self.msg("Ne cherche pas, je n'en sais rien !")
+            if self.prev_quote.details is not None:
+                self.msg("Pas d'auteur. Détails : " + self.prev_quote.details)
+            else:
+                self.msg("Ne cherche pas, je n'en sais rien !")
         else:
             if args.lower() == self.prev_quote.author.lower():
-                self.msg("Oui !")
+                mess = "Oui !"
+                if self.prev_quote.details is not None:
+                    mess += " Détails : " + self.prev_quote.details
+                self.msg(mess)
             else:
                 self.msg("Non !")
 
