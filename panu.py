@@ -153,7 +153,7 @@ class MUCBot(slixmpp.ClientXMPP):
                          '!cancel : Annule l\'ajout d\'une citation.',
                          self.cmd_cancel)
         self.add_command('feature',
-                         '!feature add|list : ajouter une demande de feature ou lister toutes les demandes.',
+                         '!feature add|list|del : ajouter une demande de feature ou lister toutes les demandes.',
                          self.cmd_feature)
         self.add_command('quote',
                          '!quote [add] [<nick>] [recherche] : Citation aléatoire.',
