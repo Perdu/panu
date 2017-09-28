@@ -24,6 +24,9 @@ from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy.orm import sessionmaker
 from  sqlalchemy.sql.expression import func
 
+import http.server
+import socketserver
+
 # Dependencies:
 # slixmpp
 # python3-sqlalchemy (debian) / python-sqlalchemy (archlinux)
@@ -36,7 +39,7 @@ CONFIG_FILE = 'panu.conf'
 Base = declarative_base()
 db = None
 user_agent = {'user-agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:34.0) Gecko/20100101 Firefox/34.0'}
-http = urllib3.PoolManager(headers=user_agent, cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
+http_pool = urllib3.PoolManager(headers=user_agent, cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
 
 class Config():
     def __init__(self, c):
@@ -49,8 +52,8 @@ class Config():
         self.fifopath = c.get('Paths', 'fifopath')
         self.shortener_url = c.get('Paths', 'shortener_url')
         self.shortener_external_url = c.get('Paths', 'shortener_external_url')
-        self.quotes_server_port = c.get('Paths', 'quotes_server_port')
-        self.quotes_external_url = c.get('Paths', 'quotes_external_url') + self.quotes_server_port
+        self.quotes_server_port = c.getint('Paths', 'quotes_server_port')
+        self.quotes_external_url = c.get('Paths', 'quotes_external_url') + str(self.quotes_server_port)
 
         self.db_name = c.get('Database', 'db_name')
         self.db_server = c.get('Database', 'db_server')
@@ -279,6 +282,7 @@ class MUCBot(slixmpp.ClientXMPP):
         if related_quote != None:
             self.msg(self.convert_quote(related_quote.quote, msg['mucnick']))
             self.prev_quote.author = related_quote.author
+            self.prev_quote.details = related_quote.details
             self.prev_related_quote_word = word
             self.prev_joker = related_quote.author
             self.p = 0
@@ -344,7 +348,7 @@ class MUCBot(slixmpp.ClientXMPP):
 
     def shortener(self, link):
         mess = ""
-        r = http.request('GET', link, timeout=config.url_shortener_timeout)
+        r = http_pool.request('GET', link, timeout=config.url_shortener_timeout)
         if r.status != 200:
             self.msg(str(r.status))
             return
@@ -355,7 +359,7 @@ class MUCBot(slixmpp.ClientXMPP):
         else:
             title = ""
         if len(link) >= config.min_link_size or config.min_link_size == 0:
-            r = http.request('GET', config.shortener_url + '?url=' + base64.b64encode(link.encode('utf8')).decode('ascii'))
+            r = http_pool.request('GET', config.shortener_url + '?url=' + base64.b64encode(link.encode('utf8')).decode('ascii'))
             if r.status != 200:
                 print("Got a %s error code on the shortener" % r.status)
             else:
@@ -386,7 +390,6 @@ class MUCBot(slixmpp.ClientXMPP):
                         self.msg("Citation déjà connue.")
                     else:
                         q = Quote(author=author, quote=quote, details=details)
-                        print(q, q.quote_id)
                         db.add(q)
                         db.commit()
                         self.last_added_quote = q
@@ -643,6 +646,19 @@ class MUCBot(slixmpp.ClientXMPP):
         db.commit()
         print("+%s points blague pour %s de %s" % (nb_points, joker, laugher))
 
+def http_server():
+    Handler = http.server.SimpleHTTPRequestHandler
+    os.chdir('tmp')
+    port = config.quotes_server_port
+    httpd = socketserver.TCPServer(("", port), Handler)
+    print("serving at port", port)
+    httpd.serve_forever()
+
+def start_http_server():
+    thread = threading.Thread(target=http_server)
+    #thread.setDaemon(True)
+    thread.start()
+
 if __name__ == '__main__':
     parser = ArgumentParser()
     parser.add_argument("-q", "--quiet", help="set logging to ERROR",
@@ -684,6 +700,8 @@ if __name__ == '__main__':
     xmpp.register_plugin('xep_0030') # Service Discovery
     xmpp.register_plugin('xep_0045') # Multi-User Chat
     #xmpp.register_plugin('xep_0199') # XMPP Ping
+
+    start_http_server()
 
     xmpp.connect()
     xmpp.process()
