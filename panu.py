@@ -186,6 +186,9 @@ class MUCBot(slixmpp.ClientXMPP):
         self.add_command('speak',
                          '!speak [less|more|<nombre>] : diminue/augmente la fréquence des citations aléatoires.',
                          self.cmd_speak)
+        self.add_command('truth',
+                         '!truth : révèle une vérité absolue sur le monde.',
+                         self.cmd_truth)
         self.add_command('who',
                          '!who : Indique de qui est la citation précédente.',
                          self.cmd_who)
@@ -561,6 +564,26 @@ class MUCBot(slixmpp.ClientXMPP):
                     ok = False
         if ok:
             self.msg('Cap fixé à %s.' % config.min_number_for_talking)
+
+    def cmd_truth(self, args, msg):
+        # comes from justabot
+        prefix = 'abcdef'
+        db = [[],[],[],[],[],[]] # must be of len(prefix)
+        with open(sys.path[0] + '/var/truth.txt', 'rb') as f:
+            alllines = f.readlines()
+        for line in alllines:
+            l = line.decode('utf-8')
+            if l[0] in prefix:
+                for num in range(len(prefix)):
+                    if l[0] == prefix[num]:
+                        word = l[1:-1]
+                        if word:
+                            db[num].append(word)
+                        break
+        ret = ""
+        for word in db:
+            ret += word[random.randrange(len(word))]
+        self.msg(ret)
 
     def cmd_pb(self, args, msg):
         if args == None:
