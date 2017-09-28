@@ -431,6 +431,16 @@ class MUCBot(slixmpp.ClientXMPP):
     def cmd_quotes(self, args, msg):
         if args == None:
             self.msg("Syntaxe : quotes <nick>")
+            return
+        a = args.split()
+        if a[0] == 'sum':
+            if len(a) == 1:
+                nb_quotes = db.query(Quote).count()
+                self.msg(str(nb_quotes))
+            else:
+                author = a[1]
+                nb_quotes_by_author = db.query(Quote).filter_by(author=author).count()
+                self.msg(str(nb_quotes_by_author))
         else:
             quotes = db.query(Quote).filter_by(author=args).all()
             m = ""
