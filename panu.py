@@ -399,14 +399,18 @@ class MUCBot(slixmpp.ClientXMPP):
                 search = ' '.join(a[1:])
                 quotes = db.query(Quote).filter(Quote.quote.like('%' + search + '%')).all()
                 m = ""
-                self.prev_quote = Quote("", None, None)
-                for q in quotes:
-                    m += self.convert_quote(q.quote, msg['mucnick']) + "\n"
-                    self.prev_quote.author += q.author + ' '
-                    #self.prev_quote.author += q.author
-                m = m.rstrip()
-                m = m.rstrip(' ')
-                if m == "":
+                if len(quotes) > 1:
+                    self.prev_quote = Quote("", None, None)
+                    for q in quotes:
+                        m += self.convert_quote(q.quote, msg['mucnick']) + "\n"
+                        self.prev_quote.author += q.author + ' '
+                        #self.prev_quote.author += q.author
+                    m = m.rstrip()
+                    m = m.rstrip(' ')
+                elif len(quotes) == 1:
+                    self.prev_quote = quotes[0]
+                    m = self.convert_quote(quotes[0].quote, msg['mucnick'])
+                else:
                     m = "Aucune citation trouvée."
                 self.msg(m)
             else:
@@ -466,7 +470,7 @@ class MUCBot(slixmpp.ClientXMPP):
         q = db.query(Quote).filter(Quote.quote_id==l.quote_id).delete(synchronize_session='evaluate')
         db.commit()
         self.prev_quote = Quote(None, None)
-        self.msg('Citation supprimée : %s [%s]' % l.quote, l.author)
+        self.msg('Citation supprimée : %s [%s]' % (l.quote, l.author))
 
     def cmd_quiet(self, args, msg):
         if not self.quiet:
