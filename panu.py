@@ -400,7 +400,7 @@ class MUCBot(slixmpp.ClientXMPP):
                 self.prev_quote.author = ""
                 self.prev_quote.details = None
                 for q in quotes:
-                    m += q.quote + "\n"
+                    m += self.convert_quote(q.quote, msg['mucnick']) + "\n"
                     self.prev_quote.author += q.author + ' '
                     #self.prev_quote.author += q.author
                 m = m.rstrip()
