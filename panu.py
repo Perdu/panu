@@ -159,10 +159,10 @@ class MUCBot(slixmpp.ClientXMPP):
                          '!feature add|list|del : ajouter une demande de feature ou lister toutes les demandes.',
                          self.cmd_feature)
         self.add_command('quote',
-                         '!quote [add] [<nick>] [recherche] : Citation aléatoire.',
+                         '!quote [add] [<nick>]|search <recherche> : Citation aléatoire.',
                          self.cmd_quote)
         self.add_command('quotes',
-                         '!quotes <nick> : Donne toutes les citations d\'un auteur',
+                         '!quotes [sum [<nick>]|list] : Donne toutes les citations d\'un auteur',
                          self.cmd_quotes)
         self.add_command('quiet',
                          '!quiet : Rendre le bot silencieux.',
@@ -377,10 +377,7 @@ class MUCBot(slixmpp.ClientXMPP):
     def cmd_quote(self, args, msg):
         if args is not None and len(args) > 0:
             a = args.split()
-            if a[0] == 'list':
-                rs = db.query(Quote.author, func.count(Quote.author)).group_by(Quote.author)
-                self.display_result_list(rs)
-            elif a[0] == 'add':
+            if a[0] == 'add':
                 re = self.re_quote_add.search(args)
                 if re:
                     author = re.group(1)
@@ -441,6 +438,9 @@ class MUCBot(slixmpp.ClientXMPP):
                 author = a[1]
                 nb_quotes_by_author = db.query(Quote).filter_by(author=author).count()
                 self.msg(str(nb_quotes_by_author))
+        elif a[0] == 'list':
+            rs = db.query(Quote.author, func.count(Quote.author)).group_by(Quote.author)
+            self.display_result_list(rs)
         else:
             quotes = db.query(Quote).filter_by(author=args).all()
             m = ""
