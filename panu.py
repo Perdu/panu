@@ -678,13 +678,19 @@ class MUCBot(slixmpp.ClientXMPP):
             self.msg('%s : Non défini' % name)
 
     def find_related_quote(self, msgs):
+        # Look for quotes containing the least-used words
+        words_prev_msgs = []
         for msg in msgs:
             words = self.get_words(msg)
-            random.shuffle(words)
+            words = db.query(Word).filter(Word.word.in_(words)).all()
             for word in words:
-                quote = db.query(Quote).filter(Quote.quote.like('%' + word + '%')).filter(Quote.quote!=msg).order_by(func.rand()).limit(1).all()
-                if len(quote) > 0:
-                    return quote[0], word
+                words_prev_msgs.append(word)
+        words_prev_msgs.sort(key=lambda x: x.occurences)
+        #print([x.word + str(x.occurences) for x in words_prev_msgs])
+        for word in words_prev_msgs:
+            quote = db.query(Quote).filter(Quote.quote.like('%' + word.word + '%')).filter(Quote.quote!=msgs[-1]).order_by(func.rand()).limit(1).all()
+            if len(quote) > 0:
+                return quote[0], word.word
         return None, None
 
     def get_words(self, msg):
