@@ -377,11 +377,14 @@ class MUCBot(slixmpp.ClientXMPP):
         if r.status != 200:
             self.msg(str(r.status))
             return
-        t = lxml.html.fromstring(r.data.decode('UTF-8'))
-        title_search = t.find(".//title")
-        if title_search is not None:
-            title = title_search.text
-        else:
+        try:
+            t = lxml.html.fromstring(r.data.decode('UTF-8'))
+            title_search = t.find(".//title")
+            if title_search is not None:
+                title = title_search.text
+            else:
+                title = ""
+        except UnicodeDecodeError:
             title = ""
         if len(link) >= config.min_link_size or config.min_link_size == 0:
             r = http_pool.request('GET', config.shortener_url + '?url=' + base64.b64encode(link.encode('utf8')).decode('ascii'))
