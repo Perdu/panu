@@ -774,7 +774,7 @@ if __name__ == '__main__':
     xmpp.register_plugin('xep_0045') # Multi-User Chat
     #xmpp.register_plugin('xep_0199') # XMPP Ping
 
-    start_http_server()
+    #start_http_server()
 
     xmpp.connect()
     xmpp.process()
