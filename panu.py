@@ -110,6 +110,15 @@ class Feature(Base):
     feature_id = Column(Integer, primary_key=True)
     description = Column(String(1000))
 
+class Word(Base):
+    __tablename__ = "words"
+    word = Column(String(50), primary_key=True)
+    occurences = Column(Integer)
+
+    def __init__(self, word, occurences=1):
+        self.word = word
+        self.occurences = occurences
+
 class MUCBot(slixmpp.ClientXMPP):
     
     def __init__(self, jid, password, room, nick):
@@ -314,6 +323,7 @@ class MUCBot(slixmpp.ClientXMPP):
         if self.test_regexps(msg):
             return
         self.p += 1
+        self.add_words(msg['body'])
         if random.randint(0, config.min_number_for_talking) < self.p:
             if not self.search_and_answer_related_quote(msg):
                 self.random_quote(msg, answer=False)
@@ -346,6 +356,16 @@ class MUCBot(slixmpp.ClientXMPP):
             self.send_message(mto=config.room_jid, mbody=text, mtype='groupchat')
             print(self.nick + ': ' + text)
             self.update_prev_msgs_list(text, self.prev_msgs)
+
+    def add_words(self, msg):
+        words = self.get_words(msg)
+        for word in words:
+            if db.query(Word).filter_by(word=word).scalar() is None:
+                w = Word(word, 1)
+                db.add(w)
+            else:
+                db.query(Word).filter_by(word=word).update({'occurences': Word.occurences + 1})
+        db.commit()
 
     def add_command(self, name, description, handler):
         cmd = Command(description, handler)
