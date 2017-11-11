@@ -360,6 +360,8 @@ class MUCBot(slixmpp.ClientXMPP):
     def add_words(self, msg):
         words = self.get_words(msg)
         for word in words:
+            if len(word) >= 50:
+                continue
             if db.query(Word).filter_by(word=word).scalar() is None:
                 w = Word(word, 1)
                 db.add(w)
