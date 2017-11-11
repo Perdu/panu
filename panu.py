@@ -59,7 +59,7 @@ class Config():
         self.db_server = c.get('Database', 'db_server')
         self.db_user = c.get('Database', 'db_user')
         self.db_pass = c.get('Database', 'db_pass')
-        self.db_port = c.get('Database', 'db_port')
+        #self.db_port = c.get('Database', 'db_port')
 
         self.bot_nick = c.get('Other', 'bot_nick')
         self.admin = c.get('Other', 'admin')

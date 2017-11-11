@@ -29,7 +29,7 @@ db_name = anu
 db_server = localhost
 db_user = anu
 db_pass =
-db_port =
+#db_port =
 
 [Other]
 bot_nick = anu
