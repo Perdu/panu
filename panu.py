@@ -59,6 +59,8 @@ class Config():
         self.db_server = c.get('Database', 'db_server')
         self.db_user = c.get('Database', 'db_user')
         self.db_pass = c.get('Database', 'db_pass')
+        self.backup_location = c.get('Database', 'backup_location')
+        self.backup_message = c.get('Database', 'backup_message')
         #self.db_port = c.get('Database', 'db_port')
 
         self.bot_nick = c.get('Other', 'bot_nick')
@@ -159,6 +161,9 @@ class MUCBot(slixmpp.ClientXMPP):
         self.add_command('battle',
                          '!battle : sélectionne un choix au hasard',
                          self.cmd_battle)
+        self.add_command('backup',
+                         '!backup : génère une backup de la base de données',
+                         self.cmd_backup)
         self.add_command('cyber',
                          '!cyber [<proba>] : Active le cyber-mode cyber.',
                          self.cmd_cyber)
@@ -643,6 +648,14 @@ class MUCBot(slixmpp.ClientXMPP):
                 self.msg('Feature request supprimée : %s' % description)
         else:
             self.msg('Syntaxe : !feature add|list')
+
+    def cmd_backup(self, args, msg):
+        #process_args = ["mysqldump", "-u", config.db_user, "-p", config.db_pass, config.db_name]
+        #p1 = Popen(process_args, stdout='test.sql', stderr=STDOUT)
+        #os.system("mysqldump -u '%s' --password='%s' '%s' > test.sql" % (config.db_user, config.db_pass, config.db_name))
+        val = os.system("mysqldump -u '%s' --password='%s' '%s' > backup.sql && scp backup.sql %s" % ('root', 'GhTdWcOmarch&' , config.db_name, config.backup_location))
+        if val == 0:
+            self.msg(config.backup_message)
 
     def anti_hl(self, nick):
         # add '_' in the nick to prevent HL

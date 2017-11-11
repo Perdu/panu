@@ -30,6 +30,10 @@ db_server = localhost
 db_user = anu
 db_pass =
 #db_port =
+# a ssh location where you want your backup to be exported
+backup_location =
+# message to display after export (e.g. external link of the location)
+backup_message =
 
 [Other]
 bot_nick = anu
