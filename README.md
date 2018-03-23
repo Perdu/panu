@@ -1,13 +1,10 @@
 # panu
 
-Python version of anu. Currently under rewrite.
+An awesome Jabber bot. Python version of anu. It can tell you how funny people in the room are, remember tons of quotes and definitions, shorten URL and display the page's title... How cool is that?
 
 *A*wesome *N*etwork *U*ser
 
-An awesome Jabber bot. It can tell you how funny people in the room are, remember tons of quotes and definitions, shorten URL and display the page's title... How cool is that?
-
 Also, "anu" is almost ROT1 for "bot". Almost.
-
 
 Here's the help message (in French), which gives you a (non-exhaustive) overview of the functionalities:
 
