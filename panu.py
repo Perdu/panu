@@ -28,9 +28,9 @@ import http.server
 import socketserver
 
 # Dependencies:
-# slixmpp
+# slixmpp : python-slixmpp-git from AUR (archlinux)
 # python3-sqlalchemy (debian) / python-sqlalchemy (archlinux)
-# python3-mysqldb (debian) / mysqlclient from pip (archlinux)
+# python3-mysqldb (debian) / python-mysqlclient from AUR (archlinux)
 # python3-urllib3 (debian) / python-urllib3 (archlinux)
 # python-lxml (archlinux)
 # python3-certifi (debian) / python-certifi (archlinux)
