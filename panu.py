@@ -38,7 +38,7 @@ import socketserver
 CONFIG_FILE = 'panu.conf'
 Base = declarative_base()
 db = None
-user_agent = {'user-agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:34.0) Gecko/20100101 Firefox/34.0'}
+user_agent = {'user-agent': 'Mozilla/5.0 (Windows NT 7.0; Win64; x64; rv:60.0) Gecko/20100101 Firefox/60.0'}
 http_pool = urllib3.PoolManager(headers=user_agent, cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
 
 class Config():
