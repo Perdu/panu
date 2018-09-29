@@ -787,6 +787,7 @@ if __name__ == '__main__':
     # Setup the MUCBot and register plugins. Note that while plugins may
     # have interdependencies, the order in which you register them does
     # not matter.
+    print("Joining %s@%s with nick %s..." % (config.room, config.server, config.bot_nick))
     xmpp = MUCBot(config.jid, config.password, config.room + '@' + config.server, config.bot_nick)
     xmpp.register_plugin('xep_0030') # Service Discovery
     xmpp.register_plugin('xep_0045') # Multi-User Chat
