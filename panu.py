@@ -394,7 +394,7 @@ class MUCBot(slixmpp.ClientXMPP):
         except UnicodeDecodeError:
             title = ""
         if len(link) >= config.min_link_size or config.min_link_size == 0:
-            r = http_pool.request('GET', config.shortener_url + '?url=' + base64.b64encode(link.encode('utf8')).decode('ascii'))
+            r = http_pool.request('GET', config.shortener_url + '?url=' + base64.urlsafe_b64encode(link.encode('utf8')).decode('ascii'))
             if r.status != 200:
                 print("Got a %s error code on the shortener" % r.status)
             else:
