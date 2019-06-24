@@ -40,6 +40,8 @@ Base = declarative_base()
 db = None
 user_agent = {'user-agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:44.0) Gecko/20100101 Firefox/43.0'}
 http_pool = urllib3.PoolManager(headers=user_agent, cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
+user_agent_mobile = {'user-agent': 'Mozilla/5.0 (Linux; U; Android 4.4.2; fr-fr; SCH-I535 Build/KOT49H) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30'}
+http_pool_mobile = urllib3.PoolManager(headers=user_agent_mobile, cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
 
 class Config():
     def __init__(self, c):
@@ -149,6 +151,7 @@ class MUCBot(slixmpp.ClientXMPP):
         self.re_ans = re.compile('^' + self.nick + '\s*[:,]')
         self.re_quote_add = re.compile('add\s+([^\s]+)\s+([^|]+)(\s*\|\s*(.*))?$')
         self.re_link = re.compile('(http(s)?:\/\/[^ ]+)')
+        self.re_mobile_link = re.compile('(http(s)?:\/\/)mobile.([^ ]+)')
         self.re_def = re.compile('^!!\s*([-_\w\'’ ]+?)\s*=\s*(.*)\s*$')
         self.re_show_def = re.compile('\?\?\s*([-_\w\'’ ]+?)\s*$')
         self.re_get_words = re.compile('(\w{' + str(config.min_word_length) + ',})(?:[ ,\.\-\']|$)')
@@ -288,7 +291,14 @@ class MUCBot(slixmpp.ClientXMPP):
         self.prev_joker = msg['mucnick']
         res_re_link = self.re_link.search(msg['body'])
         if res_re_link:
-            self.shortener(res_re_link.group(1))
+            res_re_mobile_link = self.re_mobile_link.search(msg['body'])
+            if res_re_mobile_link:
+                link = res_re_mobile_link.group(1) + res_re_mobile_link.group(3)
+                print("Trying to fetch link : %s" % link)
+                self.shortener(link, mobile=True)
+            else:
+                link = res_re_link.group(1)
+                self.shortener(link)
             return True
         return False
 
@@ -378,7 +388,7 @@ class MUCBot(slixmpp.ClientXMPP):
         cmd = Command(description, handler)
         self.cmds[name] = cmd
 
-    def shortener(self, link):
+    def shortener(self, link, mobile=False):
         mess = ""
         r = http_pool.request('GET', link, timeout=config.url_shortener_timeout)
         if r.status != 200:
