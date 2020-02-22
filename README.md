@@ -1,12 +1,13 @@
 # panu
 
-An awesome Jabber bot. It can remember quotes and tell them in the appropriate context, compute how funny people in the room are according to other people's smileys, shorten URL and display the page's title... How cool is that?
+A Jabber (XMPP) bot. It can remember quotes and tell them in the appropriate context, compute how funny people in the room are according to other people's smileys, shorten URL and display the page's title... How cool is that?
 
 Coded in English, talks in French.
 
 ## Commands
 
 Commandes disponibles :
+```
 !backup : génère une backup de la base de données
 !battle : sélectionne un choix au hasard
 !cancel : Annule l'ajout d'une citation
@@ -26,6 +27,7 @@ Commandes disponibles :
 !why : Indique ce qui a provoqué la citation précédente.
 !! <nom> = <def> : ajouter une définition
 ?? <nom> : lire une définition
+```
 
 ## Dependencies
 
