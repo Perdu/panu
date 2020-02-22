@@ -653,7 +653,7 @@ class MUCBot(slixmpp.ClientXMPP):
         #process_args = ["mysqldump", "-u", config.db_user, "-p", config.db_pass, config.db_name]
         #p1 = Popen(process_args, stdout='test.sql', stderr=STDOUT)
         #os.system("mysqldump -u '%s' --password='%s' '%s' > test.sql" % (config.db_user, config.db_pass, config.db_name))
-        val = os.system("mysqldump -u '%s' --password='%s' '%s' > backup.sql && scp backup.sql %s" % ('root', 'GhTdWcOmarch&' , config.db_name, config.backup_location))
+        val = os.system("mysqldump -u '%s' --password='%s' '%s' > backup.sql && scp backup.sql %s" % (config.db_user, config.db_pass, config.db_name, config.backup_location))
         if val == 0:
             self.msg(config.backup_message)
 
