@@ -19,8 +19,12 @@ fifopath = fifo
 # Yea, you can use mine. I'd appreciate if you used your own, though
 shortener_url = https://ploudseeker.com/s/
 shortener_external_url = https://ploudseeker.com/s/
+
 # URL for the quotes server. This is a simple HTTP server created in a thread of the bot.
 # Just make sure it's reachable from the internet
+# Warning: disabled by default because this is not secure,
+# see https://docs.python.org/2/library/simplehttpserver.html
+allow_http_server = False
 quotes_server_port = 11421
 quotes_external_url = http://YOUR_DOMAINE_NAME_OR_IP
 
