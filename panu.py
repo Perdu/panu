@@ -57,6 +57,7 @@ class Config():
         self.fifopath = c.get('Paths', 'fifopath')
         self.shortener_url = c.get('Paths', 'shortener_url')
         self.shortener_external_url = c.get('Paths', 'shortener_external_url')
+        self.allow_http_server = c.getboolean('Paths', 'allow_http_server')
         self.quotes_server_port = c.getint('Paths', 'quotes_server_port')
         self.quotes_external_url = c.get('Paths', 'quotes_external_url') + str(self.quotes_server_port)
 
@@ -816,7 +817,8 @@ if __name__ == '__main__':
     xmpp.register_plugin('xep_0045') # Multi-User Chat
     #xmpp.register_plugin('xep_0199') # XMPP Ping
 
-    #start_http_server()
+    if config.allow_http_server:
+        start_http_server()
 
     xmpp.connect()
     xmpp.process()
