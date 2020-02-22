@@ -40,7 +40,7 @@ backup_message =
 
 [Other]
 bot_nick = anu
-# The bot's admin's nick. He will have several supplementary rights on the bot.
+# The bot's admin's nick. They will have several supplementary rights on the bot.
 # (e.g. make the bot quiet and handle joke points)
 # Beware: there is NO JID verification
 admin = YOUR_NICK
