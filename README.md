@@ -32,9 +32,27 @@ Commandes disponibles :
 ## Dependencies
 
 - slixmpp : python-slixmpp-git from AUR (archlinux)
+- mysql/mariadb
 - python-sqlalchemy
 - python-mysqldb (debian) / python-mysqlclient from AUR (archlinux)
 - python-urllib3
 - python-lxml
 - python-certifi
 - a web server for the URL shortener
+
+## Install
+
+### Basic configuration
+
+- copy panu.conf.example to panu.conf
+- Create an XMPP account an indicate the JID and password in panu.conf
+- Indicate room and server to be joined in panu.conf
+
+### Database
+
+- create a mariadb database, a user and give access rights for the database to the user
+- enter related configuration in the Database section of panu.conf
+
+### URL shortener (optional)
+
+Place shortener/index.php on a web server you own. Optionally, you can use mine (default config)
