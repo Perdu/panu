@@ -1,27 +1,38 @@
 # panu
 
-An awesome Jabber bot. It can tell you how funny people in the room are, remember quotes and tell them in the appropriate context, shorten URL and display the page's title... How cool is that?
+An awesome Jabber bot. It can remember quotes and tell them in the appropriate context, compute how funny people in the room are according to other people's smileys, shorten URL and display the page's title... How cool is that?
 
-Here's the help message (in French), which gives you a (non-exhaustive) overview of the functionalities:
+Coded in English, talks in French.
 
-Commandes disponibles :                                                                            
-- !ins \<Pseudo\> \<insulte\> (en message privé) : envoie anonymement une insulte à la personne ciblée.
-- !help : affiche cette aide.
-- !pb : affiche les points-blague
-- !alias \<nick1\> \<nick2\> : donne les points blague de nick2 à nick1
-- !battle : sélectionne un choix au hasard.
-- !cyber [\<proba\>]: Active le cyber-mode cyber.
-- !philo : Dicte une phrase philosophique profonde.
-- !quote [add] [\<nick\>] [recherche]: Citation aléatoire.
-- !quote list : Liste tous les auteurs
-- !quotes \<nick\> : Donne toutes les citations d'un auteur
-- !quote search <recherche> : recherche parmi toutes les citations
-- !who : Indique de qui est la citation précédente.
-- !isit [nick] : Deviner de qui est la citation précédente.
-- !speak less|more|\<number\> : diminue/augmente la fréquence des citations aléatoires
-- !link [lien] : raccourcit le lien passé en paramètre, ou le lien précédent sinon
-- !! \<nom\> = \<def\> : ajouter une définition
-- !feature add|list : ajouter une demande de feature ou lister toutes les demandes
-- ?? \<nom\> : lire une définition
+## Commands
 
-Coded in English, but talks in French. If you want it to talk in English or another language, translate it or contact me.
+Commandes disponibles :
+!backup : génère une backup de la base de données
+!battle : sélectionne un choix au hasard
+!cancel : Annule l'ajout d'une citation
+!cyber [<proba>] : Active le cyber-mode cyber.
+!delete : Supprime la dernière citation
+!feature add|list|del : ajouter une demande de feature ou lister toutes les demandes.
+!help : affiche les commandes disponibles
+!isit <nick> : Deviner de qui est la citation précédente.
+!pb [nick|date] : affiche les points-blague.
+!quiet : Rendre le bot silencieux.
+!quote [add] [<nick>]|search <recherche> : Citation aléatoire.
+!quotes [sum [<nick>]|list] : Donne toutes les citations d'un auteur
+!related : Donne une citation en rapport.
+!speak [less|more|<nombre>] : diminue/augmente la fréquence des citations aléatoires.
+!truth : révèle une vérité absolue sur le monde.
+!who : Indique de qui est la citation précédente.
+!why : Indique ce qui a provoqué la citation précédente.
+!! <nom> = <def> : ajouter une définition
+?? <nom> : lire une définition
+
+## Dependencies
+
+- slixmpp : python-slixmpp-git from AUR (archlinux)
+- python-sqlalchemy
+- python-mysqldb (debian) / python-mysqlclient from AUR (archlinux)
+- python-urllib3
+- python-lxml
+- python-certifi
+- a web server for the URL shortener
