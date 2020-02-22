@@ -5,7 +5,7 @@
 server = chat.jabberfr.org
 # Room name to join.
 # This his is also the first param, i.e. you can do ./jabber_bot.pl <room>
-room = anu
+room = panu
 # Connection server, to which you have a registered account
 # login for the connection server
 jid = YOUR_JID
@@ -28,9 +28,9 @@ quotes_server_port = 11421
 quotes_external_url = http://YOUR_DOMAINE_NAME_OR_IP
 
 [Database]
-db_name = anu
+db_name = panu
 db_server = localhost
-db_user = anu
+db_user = panu
 db_pass =
 #db_port =
 # a ssh location where you want your backup to be exported
@@ -39,7 +39,7 @@ backup_location =
 backup_message =
 
 [Other]
-bot_nick = anu
+bot_nick = panu
 # The bot's admin's nick. They will have several supplementary rights on the bot.
 # (e.g. make the bot quiet and handle joke points)
 # Beware: there is NO JID verification
