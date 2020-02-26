@@ -1,6 +1,6 @@
 # panu
 
-A Jabber (XMPP) bot. It can remember quotes and tell them in the appropriate context, compute how funny people in the room are according to other people's smileys, shorten URL and display the page's title... How cool is that?
+A Jabber (XMPP) bot. You can tell him quotes and it will reuse them in the appropriate context. It can compute how funny people in the room are according to other people's smileys, shorten URL and display the page's title... How cool is that?
 
 Coded in English, talks in French.
 
