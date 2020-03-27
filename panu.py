@@ -41,10 +41,10 @@ db = None
 # recent user-agents: https://www.whatismybrowser.com/guides/the-latest-user-agent/chrome
 user_agent = {'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.87 Safari/537.36'}
 # For some reason, twitter stopped accepting Chrome user-agent but is fine with wget (wtf?)
-user_agent_twitter = {'user-agent': 'Wget/1.20.3 (linux-gnu)'}
+user_agent_twitter_yt = {'user-agent': 'Wget/1.20.3 (linux-gnu)'}
 http_pool = urllib3.PoolManager(headers=user_agent, cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
 #user_agent_mobile = {'user-agent': 'Mozilla/5.0 (Linux; Android 8.0.0;) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.87 Mobile Safari/537.36'}
-http_pool_twitter = urllib3.PoolManager(headers=user_agent_twitter, cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
+http_pool_twitter_yt = urllib3.PoolManager(headers=user_agent_twitter_yt, cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
 
 class Config():
     def __init__(self, c):
@@ -156,7 +156,7 @@ class MUCBot(slixmpp.ClientXMPP):
         self.re_quote_add = re.compile('add\s+([^\s]+)\s+([^|]+)(\s*\|\s*(.*))?$')
         self.re_link = re.compile('(http(s)?:\/\/[^ ]+)')
         self.re_mobile_link = re.compile('(http(s)?:\/\/)mobile.([^ ]+)')
-        self.re_twitter_link = re.compile('(http(s)?:\/\/)(mobile\.)?twitter\.com.*')
+        self.re_twitter_yt_link = re.compile('(http(s)?:\/\/)(mobile\.|www\.)?(twitter\.com|youtube\.com|youtu\.be).*')
         self.re_def = re.compile('^!!\s*([-_\w\'’ ]+?)\s*=\s*(.*)\s*$')
         self.re_show_def = re.compile('\?\?\s*([-_\w\'’ ]+?)\s*$')
         self.re_get_words = re.compile('(\w{' + str(config.min_word_length) + ',})(?:[ ,\.\-\']|$)')
@@ -297,8 +297,8 @@ class MUCBot(slixmpp.ClientXMPP):
         res_re_link = self.re_link.search(msg['body'])
         if res_re_link:
             mobile = False
-            twitter = False
-            res_re_twitter_link = self.re_twitter_link.search(msg['body'])
+            twitter_yt = False
+            res_re_twitter_yt_link = self.re_twitter_yt_link.search(msg['body'])
             res_re_mobile_link = self.re_mobile_link.search(msg['body'])
             if res_re_mobile_link:
                 link = res_re_mobile_link.group(1) + res_re_mobile_link.group(3)
@@ -306,9 +306,9 @@ class MUCBot(slixmpp.ClientXMPP):
                 mobile = True
             else:
                 link = res_re_link.group(1)
-            if res_re_twitter_link:
-                twitter = True
-            self.shortener(link, mobile=mobile, twitter=twitter)
+            if res_re_twitter_yt_link:
+                twitter_yt = True
+            self.shortener(link, mobile=mobile, twitter_yt=twitter_yt)
             return True
         return False
 
@@ -398,11 +398,11 @@ class MUCBot(slixmpp.ClientXMPP):
         cmd = Command(description, handler)
         self.cmds[name] = cmd
 
-    def shortener(self, link, mobile=False, twitter=False):
+    def shortener(self, link, mobile=False, twitter_yt=False):
         mess = ""
-        # twitter requires a different user-agent
-        if twitter:
-            r = http_pool_twitter.request('GET', link, timeout=config.url_shortener_timeout)
+        # twitter and Youtube require a different user-agent
+        if twitter_yt:
+            r = http_pool_twitter_yt.request('GET', link, timeout=config.url_shortener_timeout)
         else:
             r = http_pool.request('GET', link, timeout=config.url_shortener_timeout)
         if r.status != 200:
