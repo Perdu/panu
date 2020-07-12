@@ -414,8 +414,10 @@ class MUCBot(slixmpp.ClientXMPP):
             if title_search is not None:
                 title = title_search.text
             else:
+                print("No title found")
                 title = ""
         except UnicodeDecodeError:
+            print("UnicodeDecodeError while trying to obtain title")
             title = ""
         if len(link) >= config.min_link_size or config.min_link_size == 0 or mobile:
             r = http_pool.request('GET', config.shortener_url + '?url=' + base64.urlsafe_b64encode(link.encode('utf8')).decode('ascii'))
