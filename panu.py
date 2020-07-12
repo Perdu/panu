@@ -409,13 +409,22 @@ class MUCBot(slixmpp.ClientXMPP):
             self.msg(str(r.status))
             return
         try:
+            title = ""
             t = lxml.html.fromstring(r.data.decode('UTF-8'))
+            # First, look for meta title tag (e.g. for youtube)
+            title_search = t.xpath('.//meta[@name="title"]/@content')
+            if len(title_search) > 0:
+                title = title_search[0]
+            else:
+                print("No meta title tag found")
             title_search = t.find(".//title")
             if title_search is not None:
-                title = title_search.text
+                if title == "":
+                    title = title_search.text
+                else:
+                    title += " - " + title_search.text
             else:
-                print("No title found")
-                title = ""
+                print("No title tag found")
         except UnicodeDecodeError:
             print("UnicodeDecodeError while trying to obtain title")
             title = ""
