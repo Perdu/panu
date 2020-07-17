@@ -66,7 +66,7 @@ class Config():
         self.db_user = c.get('Database', 'db_user')
         self.db_pass = c.get('Database', 'db_pass')
         self.backup_location = c.get('Database', 'backup_location')
-        self.backup_message = c.get('Database', 'backup_message')
+        self.backup_external_location = c.get('Database', 'backup_external_location')
         #self.db_port = c.get('Database', 'db_port')
 
         self.bot_nick = c.get('Other', 'bot_nick')
@@ -685,9 +685,10 @@ class MUCBot(slixmpp.ClientXMPP):
             self.msg('Syntaxe : !feature add|list')
 
     def cmd_backup(self, args, msg):
-        val = os.system("mysqldump -u '%s' --password='%s' '%s' > backup.sql && scp backup.sql %s" % (config.db_user, config.db_pass, config.db_name, config.backup_location))
+        filename = datetime.datetime.now().strftime("%Y_%m_%d") + '_backup.sql'
+        val = os.system("mysqldump -u '%s' --password='%s' '%s' > %s && scp %s %s" % (config.db_user, config.db_pass, config.db_name, filename, filename, config.backup_location))
         if val == 0:
-            self.msg(config.backup_message)
+            self.msg(config.backup_external_location + filename)
 
     def anti_hl(self, nick):
         # add '_' in the nick to prevent HL
