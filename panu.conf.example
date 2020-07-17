@@ -34,6 +34,8 @@ db_user = panu
 db_pass =
 #db_port =
 # a ssh location where you want your backup to be exported
+# Please configure a .htpasswd, otherwise anyone joining the bot's room can
+# obtain the database
 backup_location =
 # message to display after export (e.g. external link of the location)
 backup_message =
