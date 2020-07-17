@@ -36,9 +36,9 @@ db_pass =
 # a ssh location where you want your backup to be exported
 # Please configure a .htpasswd, otherwise anyone joining the bot's room can
 # obtain the database
-backup_location = ploudseeker.com:www/public/files/anu/
+backup_location =
 # external URL of the backup location, used to display it after export
-backup_external_location = https://ploudseeker.com/files/anu/
+backup_external_location =
 
 [Other]
 bot_nick = panu
