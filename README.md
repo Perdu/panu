@@ -4,29 +4,31 @@ A Jabber (XMPP) bot. You can tell him quotes and it will reuse them in the appro
 
 Coded in English, talks in French.
 
+Status: actively used and maintained (2020).
+
 ## Commands
 
 Commandes disponibles :
 ```
-!backup : génère une backup de la base de données
-!battle : sélectionne un choix au hasard
-!cancel : Annule l'ajout d'une citation
+!backup : génère une backup de la base de données.
+!battle : sélectionne un choix au hasard.
+!cancel : Annule l'ajout d'une citation.
 !cyber [<proba>] : Active le cyber-mode cyber.
-!delete : Supprime la dernière citation
+!delete : Supprime la dernière citation.
 !feature add|list|del : ajouter une demande de feature ou lister toutes les demandes.
 !help : affiche les commandes disponibles
 !isit <nick> : Deviner de qui est la citation précédente.
 !pb [nick|date] : affiche les points-blague.
 !quiet : Rendre le bot silencieux.
 !quote [add] [<nick>]|search <recherche> : Citation aléatoire.
-!quotes [sum [<nick>]|list] : Donne toutes les citations d'un auteur
+!quotes [sum [<nick>]|list] : Donne toutes les citations d'un auteur.
 !related : Donne une citation en rapport.
 !speak [less|more|<nombre>] : diminue/augmente la fréquence des citations aléatoires.
 !truth : révèle une vérité absolue sur le monde.
 !who : Indique de qui est la citation précédente.
 !why : Indique ce qui a provoqué la citation précédente.
-!! <nom> = <def> : ajouter une définition
-?? <nom> : lire une définition
+!! <nom> = <def> : ajouter une définition.
+?? <nom> : lire une définition.
 ```
 
 ## Dependencies
@@ -44,9 +46,9 @@ Commandes disponibles :
 
 ### Basic configuration
 
-- copy panu.conf.example to panu.conf
-- Create an XMPP account an indicate the JID and password in panu.conf
-- Indicate room and server to be joined in panu.conf
+- copy `panu.conf.example` to `panu.conf`
+- Create an XMPP account an indicate the JID and password in `panu.conf`
+- Indicate room and server to be joined in `panu.conf`
 
 ### Database
 
@@ -55,4 +57,4 @@ Commandes disponibles :
 
 ### URL shortener (optional)
 
-Place shortener/index.php on a web server you own. Optionally, you can use mine (default config)
+Place `shortener/index.php` on a web server you own. Optionally, you can use mine (default config)
