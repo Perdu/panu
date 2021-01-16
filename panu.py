@@ -307,6 +307,7 @@ class MUCBot(slixmpp.ClientXMPP):
             else:
                 link = res_re_link.group(1)
             if res_re_twitter_yt_link:
+                link = re.sub("twitter.com", "nitter.net", link)
                 twitter_yt = True
             self.shortener(link, mobile=mobile, twitter_yt=twitter_yt)
             return True
