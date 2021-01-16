@@ -65,6 +65,8 @@ url_shortener_max_size = 1000000
 min_word_length = 5
 # Number of previous messages to consider for !related
 nb_prev_msg_for_related = 5
+# Whether to log used words in the database (to show contextual quotes)
+log_words = True
 # Sentence to write when a quote is requested and no quote has been issued yet.
 sentence_no_author = Le silence est d'or.
 # Maximum number of people to display with command !pb

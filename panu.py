@@ -80,6 +80,7 @@ class Config():
         self.min_word_length = c.getint('Other', 'min_word_length')
         self.joke_points_max_display = c.getint('Other', 'joke_points_max_display')
         self.nb_prev_msg = c.getint('Other', 'nb_prev_msg_for_related')
+        self.log_words = c.getboolean('Other', 'log_words')
 
 class Command():
     def __init__(self, description, handler):
@@ -384,6 +385,8 @@ class MUCBot(slixmpp.ClientXMPP):
             self.update_prev_msgs_list(text, self.prev_msgs)
 
     def add_words(self, msg):
+        if not config.log_words:
+            return
         words = self.get_words(msg)
         for word in words:
             if len(word) >= 50:
