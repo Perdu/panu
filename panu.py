@@ -420,10 +420,8 @@ class MUCBot(slixmpp.ClientXMPP):
                 print("No meta title tag found")
             title_search = t.find(".//title")
             if title_search is not None:
-                if title == "":
+                if len(title_search.text) > len(title) :
                     title = title_search.text
-                else:
-                    title += " - " + title_search.text
             else:
                 print("No title tag found")
         except UnicodeDecodeError:
