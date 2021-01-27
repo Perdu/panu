@@ -241,7 +241,7 @@ class MUCBot(slixmpp.ClientXMPP):
         """
         self.get_roster()
         self.send_presence()
-        self.plugin['xep_0045'].join_muc(self.room, self.nick, wait=True)
+        self.plugin['xep_0045'].join_muc(self.room, self.nick)
 
     def create_fifo(self, path):
         try:
