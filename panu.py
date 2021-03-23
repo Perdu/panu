@@ -155,7 +155,7 @@ class MUCBot(slixmpp.ClientXMPP):
         self.re_cmd = re.compile('^!(\w+)( +(.*))?')
         self.re_ans = re.compile('.*(\s|^)+' + self.nick + '([\s:,.!?;]|$)+.*')
         self.re_quote_add = re.compile('add\s+([^\s]+)\s+([^|]+)(\s*\|\s*(.*))?$')
-        self.re_link = re.compile('(http(s)?:\/\/[^ ]+)')
+        self.re_link = re.compile('(http(s)?:\/\/[^\n ]+)')
         self.re_mobile_link = re.compile('(http(s)?:\/\/)mobile.([^ ]+)')
         self.re_twitter_yt_link = re.compile('(http(s)?:\/\/)(mobile\.|www\.)?(twitter\.com|youtube\.com|youtu\.be).*')
         self.re_def = re.compile('^!!\s*([-_\w\'’ ]+?)\s*=\s*(.*)\s*$')
