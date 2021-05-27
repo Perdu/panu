@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+    db:
+        image: mariadb:10.6
+        restart: always
+        environment:
+            - MARIADB_DATABASE=panu
+            - MARIADB_PASSWORD=CHANGEME
+            - MARIADB_USER=panu
+        volumes:
+            - ./db/data:/var/lib/mysql
+        networks:
+            - back-tier
+        ports:
+            - 3306:3306
+    panu:
+        build: .
+        depends_on:
+            - db
+        restart: always
+        networks:
+            - back-tier
+
+networks:
+  back-tier:
