@@ -32,6 +32,12 @@ db_name = panu
 db_server = localhost
 db_user = panu
 db_pass =
+# If using docker, enter the following configuration:
+# db_name = panu
+# db_server = db
+# db_user = panu
+# db_pass = CHANGEME # same password as in docker-compose.yml
+
 #db_port =
 # a ssh location where you want your backup to be exported
 # Please configure a .htpasswd, otherwise anyone joining the bot's room can
