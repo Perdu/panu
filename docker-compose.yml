@@ -21,6 +21,10 @@ services:
         restart: always
         networks:
             - back-tier
+        command: sh -c './wait-for db:3306 -- python3 panu.py'
+    shortener:
+        image: php:8.0-apache
+        build: shortener/
 
 networks:
   back-tier:

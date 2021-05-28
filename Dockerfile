@@ -7,6 +7,7 @@ WORKDIR /app
 COPY requirements.txt /app/requirements.txt
 RUN pip3 install --upgrade pip && pip3 install -r requirements.txt
 
+COPY docker/* /app/
 COPY panu.py /app/
 COPY panu.conf.docker /app/panu.conf
 
