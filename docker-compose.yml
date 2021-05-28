@@ -25,6 +25,10 @@ services:
     shortener:
         image: php:8.0-apache
         build: shortener/
+        networks:
+            - back-tier
+        ports:
+            - 80:80
 
 networks:
   back-tier:
