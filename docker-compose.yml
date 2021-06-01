@@ -6,8 +6,9 @@ services:
         restart: always
         environment:
             - MARIADB_DATABASE=panu
-            - MARIADB_PASSWORD=CHANGEME
+            - MARIADB_PASSWORD=${MARIADB_PASSWORD}
             - MARIADB_USER=panu
+            - MARIADB_RANDOM_ROOT_PASSWORD=1
         volumes:
             - ./db/data:/var/lib/mysql
         networks:
