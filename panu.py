@@ -46,7 +46,6 @@ user_agent_twitter_yt = {'user-agent': 'Wget/1.20.3 (linux-gnu)'}
 http_pool = urllib3.PoolManager(headers=user_agent, cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
 #user_agent_mobile = {'user-agent': 'Mozilla/5.0 (Linux; Android 8.0.0;) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.87 Mobile Safari/537.36'}
 http_pool_twitter_yt = urllib3.PoolManager(headers=user_agent_twitter_yt, cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
-nitter_instances = ["nitter.net", "nitter.42l.fr", "nitter.fdn.fr"]
 
 class Config():
     def __init__(self, c):
@@ -83,6 +82,8 @@ class Config():
         self.joke_points_max_display = c.getint('Other', 'joke_points_max_display')
         self.nb_prev_msg = c.getint('Other', 'nb_prev_msg_for_related')
         self.log_words = c.getboolean('Other', 'log_words')
+        self.nitter_instances = c.get('Other', 'nitter_instances').split(",")
+        self.nitter_instances = [x.strip() for x in self.nitter_instances]
 
 class Command():
     def __init__(self, description, handler):
@@ -418,8 +419,9 @@ class MUCBot(slixmpp.ClientXMPP):
             # we'll try different known nitter instances for twitter
             ok = False
             if twitter:
-                while not ok and self.pos_nitter_instances < len(nitter_instances):
-                    nitter_link = re.sub("twitter.com", nitter_instances[self.pos_nitter_instances], link)
+                nb_instances = len(config.nitter_instances)
+                while not ok and self.pos_nitter_instances < nb_instances:
+                    nitter_link = re.sub("twitter.com", config.nitter_instances[self.pos_nitter_instances], link)
                     print("Trying link: %s" % nitter_link)
                     try:
                         r = http_pool_twitter_yt.request('GET', nitter_link, timeout=config.url_shortener_timeout)
@@ -428,9 +430,9 @@ class MUCBot(slixmpp.ClientXMPP):
                     except (ssl.SSLCertVerificationError, urllib3.exceptions.MaxRetryError) as e:
                         print("Error: certificate error: %s" % e)
                     if not ok:
-                        print("Error: nitter %s instance not working" % nitter_instances[self.pos_nitter_instances])
+                        print("Error: nitter %s instance not working" % config.nitter_instances[self.pos_nitter_instances])
                         self.pos_nitter_instances += 1
-                if self.pos_nitter_instances == len(nitter_instances):
+                if self.pos_nitter_instances == nb_instances:
                     print("Error: no working nitter instance found")
                     self.pos_nitter_instances = 0
                     return

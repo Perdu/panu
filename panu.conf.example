@@ -52,6 +52,8 @@ bot_nick = panu
 # (e.g. make the bot quiet and handle joke points)
 # Beware: there is NO JID verification
 admin = YOUR_NICK
+# Nitter instances to use to fetch Twitter content
+nitter_instances = nitter.net, nitter.42l.fr, nitter.fdn.fr
 # The bot has an internal variable p.
 # Everytime the bot sees a message, p is incremented by 1.
 # He then generates a random number between 0 and min_number_for_talking, and
