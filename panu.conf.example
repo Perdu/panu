@@ -28,15 +28,11 @@ quotes_server_port = 11421
 quotes_external_url = http://YOUR_DOMAINE_NAME_OR_IP
 
 [Database]
+# This configuration will be overwritten by setup_docker.sh
 db_name = panu
 db_server = localhost
 db_user = panu
 db_pass =
-# If using docker, enter the following configuration:
-# db_name = panu
-# db_server = db
-# db_user = panu
-# db_pass = CHANGEME # same password as in docker-compose.yml
 
 #db_port =
 # a ssh location where you want your backup to be exported
