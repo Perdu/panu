@@ -1,4 +1,6 @@
 slixmpp/
 panu.conf
+panu.conf.docker
 db/
 TAGS
+.env
