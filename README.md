@@ -50,11 +50,20 @@ Commandes disponibles :
 - Create an XMPP account an indicate the JID and password in `panu.conf`
 - Indicate room and server to be joined in `panu.conf`
 
-### Database
+#### Easy install (Docker)
+
+```bash
+./setup_docker.sh
+sudo docker-compose -f docker-compose.yml up --build
+```
+
+#### Manual install
+
+##### Database
 
 - create a mariadb database, a user and give access rights for the database to the user
 - enter related configuration in the Database section of panu.conf
 
-### URL shortener (optional)
+##### URL shortener (optional)
 
 Place `shortener/index.php` on a web server you own. Optionally, you can use mine (default config)
