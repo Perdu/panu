@@ -13,6 +13,7 @@ import base64
 import datetime
 import threading
 import os
+import ssl
 
 import urllib3
 import lxml.html
@@ -45,6 +46,7 @@ user_agent_twitter_yt = {'user-agent': 'Wget/1.20.3 (linux-gnu)'}
 http_pool = urllib3.PoolManager(headers=user_agent, cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
 #user_agent_mobile = {'user-agent': 'Mozilla/5.0 (Linux; Android 8.0.0;) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.87 Mobile Safari/537.36'}
 http_pool_twitter_yt = urllib3.PoolManager(headers=user_agent_twitter_yt, cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
+nitter_instances = ["nitter.net", "nitter.42l.fr", "nitter.fdn.fr"]
 
 class Config():
     def __init__(self, c):
@@ -151,12 +153,14 @@ class MUCBot(slixmpp.ClientXMPP):
         self.p = 0
         self.prev_joker = None
         self.last_added_quote = None
+        self.pos_nitter_instances = 0
 
         self.re_cmd = re.compile('^!(\w+)( +(.*))?')
         self.re_ans = re.compile('.*(\s|^)+' + self.nick + '([\s:,.!?;]|$)+.*')
         self.re_quote_add = re.compile('add\s+([^\s]+)\s+([^|]+)(\s*\|\s*(.*))?$')
         self.re_link = re.compile('(http(s)?:\/\/[^\n ]+)')
         self.re_mobile_link = re.compile('(http(s)?:\/\/)mobile.([^ ]+)')
+        self.re_twitter_link = re.compile('(http(s)?:\/\/)(mobile\.|www\.)?(twitter\.com).*')
         self.re_twitter_yt_link = re.compile('(http(s)?:\/\/)(mobile\.|www\.)?(twitter\.com|youtube\.com|youtu\.be).*')
         self.re_def = re.compile('^!!\s*([-_\w\'’ ]+?)\s*=\s*(.*)\s*$')
         self.re_show_def = re.compile('\?\?\s*([-_\w\'’ ]+?)\s*$')
@@ -297,20 +301,7 @@ class MUCBot(slixmpp.ClientXMPP):
         self.prev_joker = msg['mucnick']
         res_re_link = self.re_link.search(msg['body'])
         if res_re_link:
-            mobile = False
-            twitter_yt = False
-            res_re_twitter_yt_link = self.re_twitter_yt_link.search(msg['body'])
-            res_re_mobile_link = self.re_mobile_link.search(msg['body'])
-            if res_re_mobile_link:
-                link = res_re_mobile_link.group(1) + res_re_mobile_link.group(3)
-                print("Trying to fetch link : %s" % link)
-                mobile = True
-            else:
-                link = res_re_link.group(1)
-            if res_re_twitter_yt_link:
-                link = re.sub("twitter.com", "nitter.net", link)
-                twitter_yt = True
-            self.shortener(link, mobile=mobile, twitter_yt=twitter_yt)
+            self.shortener(msg['body'], res_re_link)
             return True
         return False
 
@@ -402,11 +393,49 @@ class MUCBot(slixmpp.ClientXMPP):
         cmd = Command(description, handler)
         self.cmds[name] = cmd
 
-    def shortener(self, link, mobile=False, twitter_yt=False):
+    def shortener(self, body, res_re_link):
         mess = ""
+
+        twitter_yt = False
+        mobile = False
+        twitter = False
+        res_re_twitter_link = self.re_twitter_link.search(body)
+        res_re_twitter_yt_link = self.re_twitter_yt_link.search(body)
+        res_re_mobile_link = self.re_mobile_link.search(body)
+        if res_re_mobile_link:
+            link = res_re_mobile_link.group(1) + res_re_mobile_link.group(3)
+            print("Trying to fetch link : %s" % link)
+            mobile = True
+        else:
+            link = res_re_link.group(1)
+        if res_re_twitter_link:
+            twitter = True
+        if res_re_twitter_yt_link:
+            twitter_yt = True
+
         # twitter and Youtube require a different user-agent
         if twitter_yt:
-            r = http_pool_twitter_yt.request('GET', link, timeout=config.url_shortener_timeout)
+            # we'll try different known nitter instances for twitter
+            ok = False
+            if twitter:
+                while not ok and self.pos_nitter_instances < len(nitter_instances):
+                    nitter_link = re.sub("twitter.com", nitter_instances[self.pos_nitter_instances], link)
+                    print("Trying link: %s" % nitter_link)
+                    try:
+                        r = http_pool_twitter_yt.request('GET', nitter_link, timeout=config.url_shortener_timeout)
+                        if r.status in (200, 404):
+                            ok = True
+                    except (ssl.SSLCertVerificationError, urllib3.exceptions.MaxRetryError) as e:
+                        print("Error: certificate error: %s" % e)
+                    if not ok:
+                        print("Error: nitter %s instance not working" % nitter_instances[self.pos_nitter_instances])
+                        self.pos_nitter_instances += 1
+                if self.pos_nitter_instances == len(nitter_instances):
+                    print("Error: no working nitter instance found")
+                    self.pos_nitter_instances = 0
+                    return
+            else:
+                r = http_pool_twitter_yt.request('GET', link, timeout=config.url_shortener_timeout)
         else:
             r = http_pool.request('GET', link, timeout=config.url_shortener_timeout)
         if r.status != 200:
