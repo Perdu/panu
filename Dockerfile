@@ -1,7 +1,7 @@
 FROM alpine:3.13
 MAINTAINER Célestin Matte <docker_panu@cmatte.me>
 
-RUN apk add --update build-base python3 python3-dev mysql-client libxml2-dev libxslt-dev libffi-dev py3-mysqlclient && python3 -m ensurepip
+RUN apk add --update build-base python3 python3-dev mysql-client libxml2-dev libxslt-dev libffi-dev py3-mysqlclient py3-lxml && python3 -m ensurepip
 
 WORKDIR /app
 COPY requirements.txt /app/requirements.txt
