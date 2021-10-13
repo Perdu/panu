@@ -41,9 +41,9 @@ services:
             - 80:80
         labels:
             - "traefik.enable=true"
-            - "traefik.http.routers.whoami.rule=Host(`${LETSENCRYPT_DOMAIN}`)"
-            - "traefik.http.routers.whoami.entrypoints=websecure"
-            - "traefik.http.routers.whoami.tls.certresolver=myresolver"
+            - "traefik.http.routers.shortener.rule=Host(`${LETSENCRYPT_DOMAIN}`)"
+            - "traefik.http.routers.shortener.entrypoints=websecure"
+            - "traefik.http.routers.shortener.tls.certresolver=myresolver"
     traefik:
         image: traefik:v2.5
         volumes:
