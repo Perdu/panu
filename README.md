@@ -40,7 +40,7 @@ Commandes disponibles :
 - python-urllib3
 - python-lxml
 - python-certifi
-- a web server for the URL shortener
+- a web server handling PHP scripts for the URL shortener
 
 ## Install
 
