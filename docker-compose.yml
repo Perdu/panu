@@ -33,6 +33,30 @@ services:
             - back-tier
         ports:
             - 80:80
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.whoami.rule=Host(`${LETSENCRYPT_DOMAIN}`)"
+            - "traefik.http.routers.whoami.entrypoints=websecure"
+            - "traefik.http.routers.whoami.tls.certresolver=myresolver"
+    traefik:
+        image: traefik:v2.5
+        volumes:
+            # So that Traefik can listen to the Docker events
+            - "/var/run/docker.sock:/var/run/docker.sock:ro"
+            - "./letsencrypt:/letsencrypt"
+        ports:
+            - "443:443"
+            - "8080:8080"
+        networks:
+            - back-tier
+        command:
+            - "--api.insecure=false"
+            - "--providers.docker=true"
+            - "--providers.docker.exposedbydefault=false"
+            - "--entrypoints.websecure.address=:443"
+            - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+            - "--certificatesresolvers.myresolver.acme.email=${LETSENCRYPT_EMAIL}"
+            - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
 
 networks:
   back-tier:
