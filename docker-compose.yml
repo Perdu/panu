@@ -11,6 +11,8 @@ services:
             - MARIADB_RANDOM_ROOT_PASSWORD=1
         volumes:
             - ./db/data:/var/lib/mysql
+        networks:
+            - back-tier
         ports:
             - 3306:3306
     panu:
@@ -21,9 +23,16 @@ services:
         depends_on:
             - db
         restart: always
+        networks:
+            - back-tier
         command: sh -c './wait-for db:3306 -- python3 panu.py'
     shortener:
         image: php:8.0-apache
         build: shortener/
+        networks:
+            - back-tier
         ports:
             - 80:80
+
+networks:
+  back-tier:
