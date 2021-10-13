@@ -30,6 +30,7 @@ services:
         image: php:8.0-apache
         build: shortener/
         networks:
+            - front-tier
             - back-tier
         ports:
             - 80:80
@@ -48,6 +49,7 @@ services:
             - "443:443"
             - "8080:8080"
         networks:
+            - front-tier
             - back-tier
         command:
             - "--api.insecure=false"
@@ -60,3 +62,4 @@ services:
 
 networks:
   back-tier:
+  front-tier:
