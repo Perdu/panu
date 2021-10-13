@@ -10,5 +10,7 @@ RUN pip3 install --upgrade pip && pip3 install -r requirements.txt
 COPY docker/* /app/
 COPY panu.py /app/
 COPY panu.conf.docker /app/panu.conf
+ARG EXTERNAL_URL
+RUN sed -i "s@EXTERNAL_URL@${EXTERNAL_URL}@" /app/panu.conf
 
 CMD ["python3", "panu.py"]
