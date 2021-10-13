@@ -14,6 +14,7 @@ import datetime
 import threading
 import os
 import ssl
+import time
 
 import urllib3
 import lxml.html
@@ -39,6 +40,7 @@ import socketserver
 CONFIG_FILE = 'panu.conf'
 Base = declarative_base()
 db = None
+xmpp = None
 # recent user-agents: https://www.whatismybrowser.com/guides/the-latest-user-agent/chrome
 user_agent = {'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.87 Safari/537.36'}
 # For some reason, twitter stopped accepting Chrome user-agent but is fine with wget (wtf?)
@@ -232,6 +234,7 @@ class MUCBot(slixmpp.ClientXMPP):
                                self.muc_online)
         self.add_event_handler("muc::%s::got_offline" % self.room,
                                self.muc_offline)
+        self.add_event_handler("disconnected", self.on_disconnected)
 
     def start(self, event):
         """
@@ -367,6 +370,10 @@ class MUCBot(slixmpp.ClientXMPP):
             self.plugin['xep_0045'].join_muc(self.room, self.nick, wait=True)
         else:
             self.userlist.remove(presence['muc']['nick'])
+
+    def on_disconnected(self, event):
+        time.sleep(60)
+        xmpp.connect()
 
     def msg(self, text):
         if not self.quiet:
