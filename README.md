@@ -52,6 +52,7 @@ Commandes disponibles :
 
 #### Easy install (Docker)
 
+First, copy `env.example` to `.end` and edit it with your configuration. Then, run:
 ```bash
 ./setup_docker.sh
 sudo docker-compose -f docker-compose.yml up --build
