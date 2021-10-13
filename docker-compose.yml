@@ -14,7 +14,10 @@ services:
         ports:
             - 3306:3306
     panu:
-        build: .
+        build:
+            context: .
+            args:
+                EXTERNAL_URL: ${EXTERNAL_URL}
         depends_on:
             - db
         restart: always
