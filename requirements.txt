@@ -1,6 +1,6 @@
 certifi==2022.12.7
 mysql-connector-python==8.0.22
-slixmpp==1.7.0
+slixmpp==1.8.3
 SQLAlchemy==1.3.23
 urllib3==1.26.5
 #mysqlclient==2.0.3
