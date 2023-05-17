@@ -24,7 +24,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy.orm import sessionmaker
-from  sqlalchemy.sql.expression import func
+from sqlalchemy.sql.expression import func
+from sqlalchemy.exc import OperationalError, PendingRollbackError
 
 import http.server
 import socketserver
@@ -39,6 +40,7 @@ import socketserver
 
 CONFIG_FILE = 'panu.conf'
 Base = declarative_base()
+Session = None
 db = None
 xmpp = None
 # recent user-agents: https://www.whatismybrowser.com/guides/the-latest-user-agent/chrome
@@ -285,7 +287,17 @@ class MUCBot(slixmpp.ClientXMPP):
             cmd_name = res_re_cmd.group(1)
             args = res_re_cmd.group(3)
             if cmd_name in self.cmds:
-                self.cmds[cmd_name].handler(args, msg)
+                try:
+                    self.cmds[cmd_name].handler(args, msg)
+                except OperationalError:
+                    self.msg("Erreur de connexion à la base de données.")
+                except PendingRollbackError:
+                    self.msg("Erreur de connexion à la base de données. Nouvel essai.")
+                    Session.rollback()
+                    db.dispose()
+                    db.connect()
+                    # Retry the database operation
+                    handle_pending_rollback_error()
             else:
                 self.msg("Commande inconnue.")
             return True
@@ -846,7 +858,7 @@ if __name__ == '__main__':
 
     eng = create_engine('mysql+mysqldb://' + config.db_user + ':' +
                         config.db_pass + '@' + config.db_server +
-                        '/' + config.db_name, pool_recycle=3600)
+                        '/' + config.db_name, pool_recycle=3600, pool_pre_ping=True)
     Base.metadata.bind = eng
     #Base.metadata.create_all()
     Session = sessionmaker(bind=eng)
