@@ -5,3 +5,4 @@ db/
 TAGS
 .env
 var/
+unused/
