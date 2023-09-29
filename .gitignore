@@ -4,3 +4,4 @@ panu.conf.docker
 db/
 TAGS
 .env
+var/
