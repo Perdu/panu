@@ -1,14 +1,14 @@
 ---
-# Buggy on archlinux
-#- name: Create user for panu
-#  user:
-#    name: '{{ panu_user }}'
-#    state: present
-#    home: '{{ panu_home }}'
-#    shell: '/usr/bin/nologin'
+#  Buggy on archlinux
+# - name: Create user for panu
+#   user:
+#     name: '{{ panu_user }}'
+#     state: present
+#     home: '{{ panu_home }}'
+#     shell: '/usr/bin/nologin'
 
 - name: Create folder tree
-  file:
+  ansible.builtin.file:
     path: '{{ panu_path }}'
     state: 'directory'
     owner: '{{ panu_user }}'
@@ -16,7 +16,7 @@
     mode: '740'
 
 - name: Clone panu repository
-  git:
+  ansible.builtin.git:
     repo: '{{ panu_repo }}'
     dest: '{{ panu_path }}'
     update: true
@@ -24,7 +24,7 @@
   become_user: '{{ panu_user }}'
 
 - name: Drop panu.conf
-  template:
+  ansible.builtin.template:
     src: 'panu.conf.j2'
     dest: '{{ panu_path }}/panu.conf'
     owner: '{{ panu_user }}'
@@ -32,16 +32,17 @@
     mode: '640'
 
 - name: Create systemd service
-  template:
+  ansible.builtin.template:
     src: 'panu@.service.j2'
     dest: '/etc/systemd/system/panu@.service'
     owner: 'root'
     group: 'root'
+    mode: '644'
   notify: 'Reload systemctl'
 
 # Can't be put into a handler because only one of them will be
 # executed when including the role several times
 - name: Restart systemd service (reloads the bot)
-  systemd:
+  ansible.builtin.systemd:
     state: restarted
     name: 'panu@{{ panu_fullname }}'
