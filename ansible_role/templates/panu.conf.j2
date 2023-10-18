@@ -1,0 +1,77 @@
+# Please define ALL of these keys.
+
+# Connection options configuration (server, login) :
+[Connexion]
+server = {{ panu_server }}
+# Room name to join.
+# This his is also the first param, i.e. you can do ./jabber_bot.pl <room>
+room = {{ panu_room }}
+# Connection server, to which you have a registered account
+# login for the connection server
+jid = {{ panu_jid }}
+pass = {{ panu_pass }}
+
+# Dir and file names and addresses
+[Paths]
+fifopath = fifo
+# url to the shortener. See shortener/README.txt.
+# You can define a local and an external address
+# Yea, you can use mine. I'd appreciate if you used your own, though
+shortener_url = https://ploudseeker.com/s/
+shortener_external_url = https://ploudseeker.com/s/
+
+# Simple HTTP server to browse quotes easily.
+# Warning: disabled by default because this is not secure,
+# see https://docs.python.org/2/library/simplehttpserver.html
+allow_http_server = False
+quotes_server_port = 11421
+quotes_external_url = {{ panu_external_url }}
+
+[Database]
+# This configuration will be overwritten by setup_docker.sh
+db_name = {{ panu_db_name }}
+db_server = {{ panu_db_server }}
+db_user = {{ panu_db_user }}
+db_pass = {{ panu_db_pass }}
+
+#db_port =
+# a ssh location where you want your backup to be exported
+# Please configure a .htpasswd, otherwise anyone joining the bot's room can
+# obtain the database
+backup_location =
+# external URL of the backup location, used to display it after export
+backup_external_location =
+
+[Other]
+bot_nick = {{ panu_bot_nick }}
+# The bot's admin's nick. They will have several supplementary rights on the bot.
+# (e.g. make the bot quiet and handle joke points)
+# Beware: there is NO JID verification
+admin = {{ panu_admin }}
+# Nitter instances to use to fetch Twitter content
+nitter_instances = nitter.net, nitter.42l.fr, nitter.fdn.fr
+# The bot has an internal variable p.
+# Everytime the bot sees a message, p is incremented by 1.
+# He then generates a random number between 0 and min_number_for_talking, and
+# says a random quote if this number is lesser than p.
+# In other words, the greater min_number_for_talking, the fewer the bot will talk
+min_number_for_talking = 2000
+# Shortener : shorten URL longer than that size
+# 0 = always shorten
+min_link_size = 100
+# Display websites' title up to that length
+max_title_size = 200
+# Timeout for urllib3 (Max time to wait while a URL does not respond)
+url_shortener_timeout = 10
+# Max size to download from URLs (1 MB)
+url_shortener_max_size = 1000000
+# The minimum length for a word to be cyber-ized
+min_word_length = 5
+# Number of previous messages to consider for !related
+nb_prev_msg_for_related = 5
+# Whether to log used words in the database (to show contextual quotes)
+log_words = True
+# Sentence to write when a quote is requested and no quote has been issued yet.
+sentence_no_author = Le silence est d'or.
+# Maximum number of people to display with command !pb
+joke_points_max_display = 10
