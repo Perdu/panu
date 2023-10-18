@@ -1,0 +1,47 @@
+---
+# Buggy on archlinux
+#- name: Create user for panu
+#  user:
+#    name: '{{ panu_user }}'
+#    state: present
+#    home: '{{ panu_home }}'
+#    shell: '/usr/bin/nologin'
+
+- name: Create folder tree
+  file:
+    path: '{{ panu_path }}'
+    state: 'directory'
+    owner: '{{ panu_user }}'
+    group: '{{ panu_group }}'
+    mode: '740'
+
+- name: Clone panu repository
+  git:
+    repo: '{{ panu_repo }}'
+    dest: '{{ panu_path }}'
+    update: true
+  become: true
+  become_user: '{{ panu_user }}'
+
+- name: Drop panu.conf
+  template:
+    src: 'panu.conf.j2'
+    dest: '{{ panu_path }}/panu.conf'
+    owner: '{{ panu_user }}'
+    group: '{{ panu_group }}'
+    mode: '640'
+
+- name: Create systemd service
+  template:
+    src: 'panu@.service.j2'
+    dest: '/etc/systemd/system/panu@.service'
+    owner: 'root'
+    group: 'root'
+  notify: 'Reload systemctl'
+
+# Can't be put into a handler because only one of them will be
+# executed when including the role several times
+- name: Restart systemd service (reloads the bot)
+  systemd:
+    state: restarted
+    name: 'panu@{{ panu_fullname }}'

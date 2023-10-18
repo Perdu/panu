@@ -1,0 +1,3 @@
+---
+panu_fullname: '{{ panu_room }}_at_{{ panu_server }}'
+panu_path: '{{ panu_home }}/{{ panu_fullname }}/'

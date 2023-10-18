@@ -1,0 +1,14 @@
+[Unit]
+Description=panu on room %i
+After=network.target mariadb.service
+Requires=mariadb.service
+
+[Service]
+User={{ panu_user }}
+Group={{ panu_user }}
+WorkingDirectory={{ panu_home }}/%i/
+ExecStart=/usr/bin/python -u {{ panu_home}}/%i/panu.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

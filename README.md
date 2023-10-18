@@ -68,3 +68,7 @@ sudo docker-compose -f docker-compose.yml up --build
 ##### URL shortener (optional)
 
 Place `shortener/index.php` on a web server you own. Optionally, you can use mine (default config)
+
+#### Ansible role
+
+There is also an [ansible role](ansible_role) to install new instances of the bot as a systemd service. It's not a full install, but it's useful to deploy new instances of the bot or pull latest version of the repo on running instances (see [readme](ansible_role)).
