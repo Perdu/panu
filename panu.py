@@ -21,9 +21,8 @@ import lxml.html
 import certifi
 
 from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, DateTime
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, declarative_base
 from sqlalchemy.sql.expression import func
 from sqlalchemy.exc import OperationalError, PendingRollbackError
 
