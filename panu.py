@@ -160,17 +160,17 @@ class MUCBot(slixmpp.ClientXMPP):
         self.last_added_quote = None
         self.pos_nitter_instances = 0
 
-        self.re_cmd = re.compile('^!(\w+)( +(.*))?')
-        self.re_ans = re.compile('.*(\s|^)+' + self.nick + '([\s:,.!?;]|$)+.*')
-        self.re_quote_add = re.compile('add\s+([^\s]+)\s+([^|]+)(\s*\|\s*(.*))?$')
-        self.re_link = re.compile('(http(s)?:\/\/[^\n ]+)')
-        self.re_mobile_link = re.compile('(http(s)?:\/\/)mobile.([^ ]+)')
-        self.re_twitter_link = re.compile('(http(s)?:\/\/)(mobile\.|www\.)?(twitter\.com).*')
-        self.re_twitter_yt_link = re.compile('(http(s)?:\/\/)(mobile\.|www\.)?(twitter\.com|youtube\.com|youtu\.be).*')
-        self.re_def = re.compile('^!!\s*([-_\w\'’ ]+?)\s*=\s*(.*)\s*$')
-        self.re_show_def = re.compile('\?\?\s*([-_\w\'’ ]+?)\s*$')
-        self.re_get_words = re.compile('(\w{' + str(config.min_word_length) + ',})(?:[ ,\.\-\']|$)')
-        self.re_jokepoints = re.compile('^[:xX]([Dd]+)')
+        self.re_cmd = re.compile(r'^!(\w+)( +(.*))?')
+        self.re_ans = re.compile(r'.*(\s|^)+' + self.nick + '([\s:,.!?;]|$)+.*')
+        self.re_quote_add = re.compile(r'add\s+([^\s]+)\s+([^|]+)(\s*\|\s*(.*))?$')
+        self.re_link = re.compile(r'(http(s)?:\/\/[^\n ]+)')
+        self.re_mobile_link = re.compile(r'(http(s)?:\/\/)mobile.([^ ]+)')
+        self.re_twitter_link = re.compile(r'(http(s)?:\/\/)(mobile\.|www\.)?(twitter\.com).*')
+        self.re_twitter_yt_link = re.compile(r'(http(s)?:\/\/)(mobile\.|www\.)?(twitter\.com|youtube\.com|youtu\.be).*')
+        self.re_def = re.compile(r'^!!\s*([-_\w\'’ ]+?)\s*=\s*(.*)\s*$')
+        self.re_show_def = re.compile(r'\?\?\s*([-_\w\'’ ]+?)\s*$')
+        self.re_get_words = re.compile(r'(\w{' + str(config.min_word_length) + ',})(?:[ ,\.\-\']|$)')
+        self.re_jokepoints = re.compile(r'^[:xX]([Dd]+)')
 
         self.fifo = config.fifopath
         if self.create_fifo(self.fifo):
