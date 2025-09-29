@@ -15,6 +15,7 @@ import threading
 import os
 import ssl
 import time
+import asyncio
 
 import urllib3
 import lxml.html
@@ -834,6 +835,16 @@ def start_http_server():
     #thread.setDaemon(True)
     thread.start()
 
+async def main(config):
+    xmpp = MUCBot(config.jid, config.password, config.room + '@' + config.server, config.bot_nick)
+    xmpp.register_plugin('xep_0030') # Service Discovery
+    xmpp.register_plugin('xep_0045') # Multi-User Chat
+    #xmpp.register_plugin('xep_0199') # XMPP Ping
+
+    await xmpp.connect()
+    await xmpp.disconnected
+
+
 if __name__ == '__main__':
     parser = ArgumentParser()
     parser.add_argument("-q", "--quiet", help="set logging to ERROR",
@@ -868,17 +879,12 @@ if __name__ == '__main__':
     logging.basicConfig(level=args.loglevel,
                         format='%(levelname)-8s %(message)s')
 
+    if config.allow_http_server:
+        start_http_server()
+
     # Setup the MUCBot and register plugins. Note that while plugins may
     # have interdependencies, the order in which you register them does
     # not matter.
     print("Joining %s@%s with nick %s..." % (config.room, config.server, config.bot_nick))
-    xmpp = MUCBot(config.jid, config.password, config.room + '@' + config.server, config.bot_nick)
-    xmpp.register_plugin('xep_0030') # Service Discovery
-    xmpp.register_plugin('xep_0045') # Multi-User Chat
-    #xmpp.register_plugin('xep_0199') # XMPP Ping
 
-    if config.allow_http_server:
-        start_http_server()
-
-    xmpp.connect()
-    xmpp.process()
+    asyncio.run(main(config))
