@@ -384,8 +384,17 @@ class MUCBot(slixmpp.ClientXMPP):
             self.userlist.remove(presence['muc']['nick'])
 
     def on_disconnected(self, event):
-        time.sleep(60)
-        xmpp.connect()
+        delay = 5
+        max_delay = 900
+
+        while True:
+            try:
+                time.sleep(delay)
+                xmpp.connect()
+                break
+            except Exception as e:
+                print(f"Reconnect failed ({e}), trying again in {delay}s")
+                delay = min(max_delay, delay * 2)
 
     def msg(self, text):
         if not self.quiet:
