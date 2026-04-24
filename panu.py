@@ -390,7 +390,7 @@ class MUCBot(slixmpp.ClientXMPP):
         while True:
             try:
                 time.sleep(delay)
-                xmpp.connect()
+                self.connect()
                 break
             except Exception as e:
                 print(f"Reconnect failed ({e}), trying again in {delay}s")
