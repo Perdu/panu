@@ -384,17 +384,7 @@ class MUCBot(slixmpp.ClientXMPP):
             self.userlist.remove(presence['muc']['nick'])
 
     def on_disconnected(self, event):
-        delay = 5
-        max_delay = 900
-
-        while True:
-            try:
-                time.sleep(delay)
-                self.connect()
-                break
-            except Exception as e:
-                print(f"Reconnect failed ({e}), trying again in {delay}s")
-                delay = min(max_delay, delay * 2)
+        print("Got disconnected")
 
     def msg(self, text):
         if not self.quiet:
@@ -845,13 +835,22 @@ def start_http_server():
     thread.start()
 
 async def main(config):
-    xmpp = MUCBot(config.jid, config.password, config.room + '@' + config.server, config.bot_nick)
-    xmpp.register_plugin('xep_0030') # Service Discovery
-    xmpp.register_plugin('xep_0045') # Multi-User Chat
-    #xmpp.register_plugin('xep_0199') # XMPP Ping
+    delay = 5
+    max_delay = 900
+    while True:
+        xmpp = MUCBot(config.jid, config.password, config.room + '@' + config.server, config.bot_nick)
+        xmpp.register_plugin('xep_0030') # Service Discovery
+        xmpp.register_plugin('xep_0045') # Multi-User Chat
+        #xmpp.register_plugin('xep_0199') # XMPP Ping
+        try:
+            await xmpp.connect()
+            await xmpp.disconnected
+        except Exception as e:
+            print(e)
+            delay = min(max_delay, delay * 2)
+            time.sleep(delay)
 
-    await xmpp.connect()
-    await xmpp.disconnected
+        await asyncio.sleep(5)
 
 
 if __name__ == '__main__':
