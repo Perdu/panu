@@ -101,6 +101,12 @@ class Quote(Base):
     details = Column(String(1000))
     quote = Column(String(10000))
 
+    # Ensure quotes can contain emojis
+    __table_args__ = {
+        "mysql_charset": "utf8mb4",
+        "mysql_collate": "utf8mb4_uca1400_ai_ci",
+    }
+
     def __init__(self, author, details, quote=None, quote_id=None):
         self.quote_id = quote_id
         self.author = author
