@@ -72,3 +72,11 @@ Place `shortener/index.php` on a web server you own. Optionally, you can use min
 #### Ansible role
 
 There is also an [ansible role](ansible_role) to install new instances of the bot as a systemd service. It's not a full install, but it's useful to deploy new instances of the bot or pull latest version of the repo on running instances (see [readme](ansible_role)).
+
+## Known issues
+
+If adding a quote containing an emoji fails due to OperationalError, use the following sql query to convert the table:
+
+``` sql
+ALTER TABLE quotes CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
