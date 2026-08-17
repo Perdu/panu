@@ -289,8 +289,9 @@ class MUCBot(slixmpp.ClientXMPP):
             if cmd_name in self.cmds:
                 try:
                     self.cmds[cmd_name].handler(args, msg)
-                except OperationalError:
+                except OperationalError as e:
                     self.msg("Erreur de connexion à la base de données.")
+                    print(f"Erreur de connexion à la base de données (OperationalError): {e}")
                 except PendingRollbackError:
                     self.msg("Erreur de connexion à la base de données. Nouvel essai.")
                     Session.rollback()
